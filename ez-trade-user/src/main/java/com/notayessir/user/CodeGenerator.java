@@ -16,8 +16,8 @@ public class CodeGenerator {
         String database = "jdbc:mysql://localhost:3306/ez_trade_user?useUnicode=true&useSSL=false&characterEncoding=utf8&allowPublicKeyRetrieval=true";
         String name = "root";
         String pass = "123456";
-        String moduleDirectory = "/Users/geek/IdeaProjects/mercury-ez-trade/ez-trade/src/main/java";
-        String xmlDirectory = "/Users/geek/IdeaProjects/mercury-ez-trade/ez-trade/src/main/resources/xml/generate";
+        String moduleDirectory = "/Users/geek/IdeaProjects/mercury-ez-trade/ez-trade-user/src/main/java";
+        String xmlDirectory = "/Users/geek/IdeaProjects/mercury-ez-trade/ez-trade-user/src/main/resources/xml/generate";
 
 
         FastAutoGenerator.create(database, name, pass)
@@ -27,13 +27,13 @@ public class CodeGenerator {
                             .outputDir(moduleDirectory); // 指定输出目录
                 })
                 .packageConfig(builder -> {
-                    builder.parent("com.notayessir.user")// 设置父包名
+                    builder.parent("com.notayessir.user.order")// 设置父包名
                             .moduleName("")
                             .pathInfo(Collections.singletonMap(OutputFile.xml, xmlDirectory))
                     ; // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude(Arrays.asList("t_order","t_account","t_order","t_product")) // 设置需要生成的表名
+                    builder.addInclude(Arrays.asList("t_order")) // 设置需要生成的表名
                             .addTablePrefix("t_")
                             .entityBuilder()
                             .enableLombok()

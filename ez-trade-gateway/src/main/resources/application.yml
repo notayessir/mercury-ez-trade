@@ -1,0 +1,30 @@
+server:
+  port: 38090
+
+
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5s
+      routes:
+        - id: user_path_route
+          uri: http://localhost:38080
+          predicates:
+            - Path=/user-service/**
+
+        - id: queue_path_route
+          uri: http://localhost:38081
+          predicates:
+            - Path=/queue-service/**
+
+        - id: quote_path_route
+          uri: http://localhost:38082
+          predicates:
+            - Path=/quote-service/**
+
+        - id: stream_path_route
+          uri: ws://localhost:38084
+          predicates:
+            - Path=/stream-service/**

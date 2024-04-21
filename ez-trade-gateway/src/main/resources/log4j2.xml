@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Properties>
+        <Property name="userOutput">../log/gateway.log</Property>
+    </Properties>
+
+
+    <Appenders>
+
+        <!-- console -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+
+        <!-- log file -->
+        <RollingRandomAccessFile name="baseRollingFile" fileName="${userOutput}"
+                                 filePattern="${userOutput}.%d{yyyy-MM-dd}.log.%i">
+            <PatternLayout>
+                <Pattern>%d %p %c [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <AsyncLogger name="com.notayessir" level="info" additivity="false" includeLocation="true">
+            <AppenderRef ref="baseRollingFile"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </AsyncLogger>
+
+        <Root level="info" includeLocation="true">
+            <AppenderRef ref="ConsoleAppender"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

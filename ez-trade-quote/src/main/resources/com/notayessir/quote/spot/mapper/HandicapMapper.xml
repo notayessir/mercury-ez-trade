@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.notayessir.quote.spot.mapper.HandicapMapper">
+
+    <select id="distinctAllCoinId" resultType="java.lang.Long">
+
+        select distinct(coin_id) from t_handicap;
+
+    </select>
+</mapper>

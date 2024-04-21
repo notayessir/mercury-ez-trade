@@ -2,18 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<!-- Your own application should inherit from spring-boot-starter-parent -->
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.3</version>
+		<version>3.2.5</version>
 	</parent>
 	<artifactId>mercury-ez-trade</artifactId>
 	<packaging>pom</packaging>
 	<modules>
 		<module>ez-trade-common</module>
 		<module>ez-trade-user</module>
-		<module>ez-trade-match-engine</module>
 		<module>ez-trade-quote</module>
+		<module>ez-trade-queue</module>
+		<module>ez-trade-user-api</module>
+		<module>ez-trade-stream</module>
+		<module>ez-trade-quote-api</module>
+        <module>ez-trade-gateway</module>
 	</modules>
 	<groupId>com.notayessir</groupId>
 	<name>easy-trade</name>
@@ -23,44 +26,110 @@
 	<properties>
 		<java.version>17</java.version>
 		<fastjson.version>2.0.40</fastjson.version>
-		<commons-lang3.ver>3.12.0</commons-lang3.ver>
-		<mybatis-plus.version>3.5.3.2</mybatis-plus.version>
-		<springboot.version>3.1.3</springboot.version>
-		<mysql-connector-java.ver>8.0.28</mysql-connector-java.ver>
+		<commons-lang3.version>3.12.0</commons-lang3.version>
+		<mybatis-plus.version>3.5.6</mybatis-plus.version>
+		<springboot.version>3.2.5</springboot.version>
+		<mysql-connector-java.verison>8.0.28</mysql-connector-java.verison>
 		<kafka.version>3.1.0</kafka.version>
 		<jwt.version>4.4.0</jwt.version>
-		<hutool.version>5.8.21</hutool.version>
+		<hutool.version>5.8.26</hutool.version>
 		<freemarker.version>2.3.32</freemarker.version>
 		<lombok.version>1.18.30</lombok.version>
 		<disruptor.version>3.4.4</disruptor.version>
 		<rocketmq-spring.version>2.2.3</rocketmq-spring.version>
+		<redisson.version>3.24.3</redisson.version>
+		<springdoc.version>2.2.0</springdoc.version>
+		<junit.version>5.10.1</junit.version>
+		<jackson.jsr310.version>2.17.0</jackson.jsr310.version>
 	</properties>
 
 	<dependencyManagement>
 
 		<dependencies>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
-			<dependency>
-				<groupId>org.apache.rocketmq</groupId>
-				<artifactId>rocketmq-spring-boot-starter</artifactId>
-				<version>${rocketmq-spring.version}</version>
-			</dependency>
-
-
-
+			<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
 <!--			<dependency>-->
-<!--				<groupId>org.springframework.boot</groupId>-->
-<!--				<artifactId>spring-boot-starter-aop</artifactId>-->
+<!--				<groupId>com.fasterxml.jackson.datatype</groupId>-->
+<!--				<artifactId>jackson-datatype-jsr310</artifactId>-->
+<!--				<version>${jackson.jsr310.version}</version>-->
 <!--			</dependency>-->
 
 
-			<!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
-			<!--			<dependency>-->
-			<!--				<groupId>com.lmax</groupId>-->
-			<!--				<artifactId>disruptor</artifactId>-->
-			<!--				<version>${disruptor.version}</version>-->
-			<!--			</dependency>-->
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${springboot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-websocket</artifactId>
+				<version>${springboot.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2 -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-log4j2</artifactId>
+				<version>${springboot.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.lmax</groupId>
+				<artifactId>disruptor</artifactId>
+				<version>${disruptor.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
+			<dependency>
+				<groupId>org.springframework.kafka</groupId>
+				<artifactId>spring-kafka</artifactId>
+				<version>${kafka.version}</version>
+			</dependency>
+
+
+			<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+			<dependency>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+				<version>${springdoc.version}</version>
+			</dependency>
+
+
+			<!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
+			<dependency>
+				<groupId>org.redisson</groupId>
+				<artifactId>redisson-spring-boot-starter</artifactId>
+				<version>${redisson.version}</version>
+				            <exclusions>
+				                <exclusion>
+				                    <groupId>org.springframework.boot</groupId>
+				                    <artifactId>spring-boot-starter-logging</artifactId>
+				                </exclusion>
+				            </exclusions>
+			</dependency>
+
+
 
 			<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 			<dependency>
@@ -77,25 +146,26 @@
 				<version>${freemarker.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-web</artifactId>
-				<version>${springboot.version}</version>
-			</dependency>
+
 
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-test</artifactId>
 				<version>${springboot.version}</version>
 				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-starter-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-aop</artifactId>
-				<version>${springboot.version}</version>
-			</dependency>
-
+<!--			<dependency>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-starter-aop</artifactId>-->
+<!--				<version>${springboot.version}</version>-->
+<!--			</dependency>-->
 
 
 			<dependency>
@@ -127,7 +197,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>${commons-lang3.ver}</version>
+				<version>${commons-lang3.version}</version>
 			</dependency>
 
 
@@ -135,6 +205,18 @@
 				<groupId>com.baomidou</groupId>
 				<artifactId>mybatis-plus-boot-starter</artifactId>
 				<version>${mybatis-plus.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.mybatis</groupId>
+						<artifactId>mybatis-spring</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mybatis</groupId>
+				<artifactId>mybatis-spring</artifactId>
+				<version>3.0.3</version>
 			</dependency>
 
 			<dependency>
@@ -147,15 +229,8 @@
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>${mysql-connector-java.ver}</version>
+				<version>${mysql-connector-java.verison}</version>
 			</dependency>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
-			<!--			<dependency>-->
-			<!--				<groupId>org.apache.kafka</groupId>-->
-			<!--				<artifactId>kafka-clients</artifactId>-->
-			<!--				<version>${kafka.version}</version>-->
-			<!--			</dependency>-->
 
 
 			<dependency>
@@ -163,8 +238,6 @@
 				<artifactId>java-jwt</artifactId>
 				<version>${jwt.version}</version>
 			</dependency>
-
-
 
 
 		</dependencies>
