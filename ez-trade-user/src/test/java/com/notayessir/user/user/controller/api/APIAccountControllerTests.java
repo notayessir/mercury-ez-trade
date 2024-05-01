@@ -36,7 +36,7 @@ public class APIAccountControllerTests {
         req.setUserId(1774333046012248064L);
         req.setRequestId(RandomUtil.randomString(32));
         req.setCurrency("USDT");
-        BusinessResp<Void> resp = controller.adminDeposit(req);
+        BusinessResp<Void> resp = controller.apiDeposit(req);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
     }
 

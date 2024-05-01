@@ -2,8 +2,6 @@ package com.notayessir.user.user.service;
 
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
-import com.alibaba.fastjson2.JSONObject;
-import com.notayessir.user.user.bo.TokenPayloadBO;
 import com.notayessir.user.user.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -94,9 +92,4 @@ public class UserTokenService {
         System.out.println(verified);
     }
 
-    public TokenPayloadBO getPayload(String token) {
-        JWT jwt = JWTUtil.parseToken(token);
-        String payload = jwt.getPayload().getClaimsJson().toString();
-        return JSONObject.parseObject(payload, TokenPayloadBO.class);
-    }
 }

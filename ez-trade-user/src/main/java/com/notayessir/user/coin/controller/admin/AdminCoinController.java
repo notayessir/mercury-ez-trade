@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "user-service/admin-api/coin/v1/")
+@RequestMapping(value = "user-service/admin-api/coin/")
 @RestController
 public class AdminCoinController {
 
@@ -19,7 +19,7 @@ public class AdminCoinController {
     @Autowired
     private FacadeCoinService facadeCoinService;
 
-    @PostMapping("create-coin")
+    @PostMapping("v1/create-coin")
     public BusinessResp<CreateCoinResp> adminCreateCoinPair(@RequestBody CreateCoinReq req){
         req.checkAndInit();
 

@@ -5,26 +5,37 @@ import com.notayessir.common.vo.BusinessResp;
 import com.notayessir.user.user.service.FacadeAccountService;
 import com.notayessir.user.user.vo.DepositReq;
 import com.notayessir.user.user.vo.DepositResp;
+import com.notayessir.user.user.vo.FindAccountResp;
+import com.notayessir.user.user.vo.FindAccountsReq;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping(value = "user-service/admin-api/account/v1/")
+import java.util.List;
+
+@RequestMapping(value = "user-service/api/account/")
 @RestController
 public class APIAccountController {
 
     @Autowired
     private FacadeAccountService facadeAccountService;
 
-    @PostMapping("deposit")
-    public BusinessResp<Void> adminDeposit(@RequestBody DepositReq req){
+    @PostMapping("v1/deposit")
+    public BusinessResp<Void> apiDeposit(@RequestBody DepositReq req){
         req.checkAndInit();
 
-        DepositResp resp = facadeAccountService.adminDeposit(req);
+        DepositResp resp = facadeAccountService.apiDeposit(req);
 
         return BusinessResp.ok();
+    }
+
+
+    @GetMapping("v1/find-accounts")
+    public BusinessResp<List<FindAccountResp>> apiFindAccounts(@RequestBody FindAccountsReq req){
+        req.checkAndInit();
+
+        List<FindAccountResp> resp = facadeAccountService.apiFindAccounts(req);
+
+        return BusinessResp.ok(resp);
     }
 
 

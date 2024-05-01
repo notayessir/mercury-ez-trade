@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "user-service/public-api/user/v1/")
+@RequestMapping(value = "user-service/public-api/user/")
 @RestController
 public class PubUserController {
 
@@ -19,7 +19,7 @@ public class PubUserController {
     private FacadeUserService facadeUserService;
 
 
-    @PostMapping("register")
+    @PostMapping("v1/register")
     public BusinessResp<RegisterResp> publicApiRegister(@RequestBody RegisterReq req){
         req.checkAndInit();
         RegisterResp resp = facadeUserService.publicApiRegister(req);

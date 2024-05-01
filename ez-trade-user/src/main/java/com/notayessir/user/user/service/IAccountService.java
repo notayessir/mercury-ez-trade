@@ -8,6 +8,7 @@ import com.notayessir.user.order.bo.CreateOrderReqBO;
 import com.notayessir.user.user.entity.Account;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface IAccountService extends IService<Account> {
 
@@ -36,4 +37,6 @@ public interface IAccountService extends IService<Account> {
     void exchange(Long userId, String toDeductCurrency, BigDecimal toDeductQty, String toAddCurrency, BigDecimal toAddAmount);
 
     CheckAccountResultBO checkAccount(CreateOrderReqBO req, CoinPair coinPair);
+
+    List<Account> getAccounts(Long userId);
 }

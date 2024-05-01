@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -181,6 +182,13 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         CheckAccountResultBO resultBO = new CheckAccountResultBO();
         resultBO.setAccount(account);
         return resultBO;
+    }
+
+    @Override
+    public List<Account> getAccounts(Long userId) {
+        LambdaQueryWrapper<Account> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Account::getUserId, userId);
+        return list(queryWrapper);
     }
 
     @Override

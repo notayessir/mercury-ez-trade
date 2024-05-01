@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "queue-service/admin-api/route/v1/")
+@RequestMapping(value = "queue-service/admin-api/route/")
 @RestController
 public class AdminRouteInfoController {
 
     @Autowired
     private FacadeRouteService facadeRouteService;
 
-    @PostMapping(value = "create-route")
+    @PostMapping(value = "v1/create-route")
     public BusinessResp<CreateRouteInfoResp> createRoute(@RequestBody CreateRouteInfoReq req){
         req.checkAndInit();
 

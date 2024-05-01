@@ -22,7 +22,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("stream-service/public-api/spot/v1");
+        registry.addEndpoint("stream-service/spot/public-api/v1/quote");
     }
 
     @Override

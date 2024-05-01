@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
-@RequestMapping(value = "quote-service/public-api/kline/v1/")
+@RequestMapping(value = "quote-service/public-api/kline/")
 @RestController
 public class PubKlineController {
 
@@ -21,7 +21,7 @@ public class PubKlineController {
     @Autowired
     private FacadeSpotQuoteService facadeSpotQuoteService;
 
-    @GetMapping(value = "get-kline")
+    @GetMapping(value = "v1/get-kline")
     public BusinessResp<BasePageResp<GetKlineResp>> getKline(@RequestBody BasePageReq<GetKlineReq> req){
         req.getQuery().checkAndInit();
 

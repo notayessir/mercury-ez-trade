@@ -10,7 +10,7 @@ import com.notayessir.user.coin.vo.GetCoinResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping(value = "user-service/public-api/coin/v1")
+@RequestMapping(value = "user-service/public-api/coin")
 @RestController
 public class PubCoinController {
 
@@ -19,7 +19,7 @@ public class PubCoinController {
     private FacadeCoinService facadeCoinService;
 
 
-    @GetMapping("get-coins")
+    @GetMapping("v1/get-coins")
     public BusinessResp<BasePageResp<GetCoinResp>> publicApiGetCoinPair(@RequestBody BasePageReq<GetCoinReq> req){
         GetCoinReq query = req.getQuery();
         query.checkAndInit();
@@ -31,7 +31,7 @@ public class PubCoinController {
 
 
 
-    @GetMapping("get-coin")
+    @GetMapping("v1/get-coin")
     public BusinessResp<GetCoinResp> publicApiGetCoinPair(@RequestBody GetCoinReq req){
         req.checkAndInit();
         GetCoinResp resp = facadeCoinService.publicApiGetCoinPair(req);

@@ -15,7 +15,7 @@ import com.notayessir.user.order.vo.FindOrderResp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping(value = "user-service/api/order/v1")
+@RequestMapping(value = "user-service/api/order")
 @RestController
 public class APIOrderController {
 
@@ -23,7 +23,7 @@ public class APIOrderController {
     private FacadeOrderService facadeOrderService;
 
 
-    @PostMapping(value = "create-order")
+    @PostMapping(value = "v1/create-order")
     public BusinessResp<CreateOrderResp> createOrder(@RequestBody CreateOrderReq req){
         req.checkAndInit();
         CreateOrderResp resp = facadeOrderService.apiCreateOrder(req);
@@ -31,7 +31,7 @@ public class APIOrderController {
         return BusinessResp.ok(resp);
     }
 
-    @PostMapping(value = "cancel-order")
+    @PostMapping(value = "v1/cancel-order")
     public BusinessResp<Void> cancelOrder(@RequestBody PatchOrderReq req){
         req.checkAndInit();
 
@@ -40,7 +40,7 @@ public class APIOrderController {
         return BusinessResp.ok();
     }
 
-    @GetMapping(value = "find-order")
+    @GetMapping(value = "v1/find-order")
     public BusinessResp<FindOrderResp> findOrder(@RequestBody FindOrderReq req){
         req.checkAndInit();
 
@@ -49,7 +49,7 @@ public class APIOrderController {
         return BusinessResp.ok(resp);
     }
 
-    @GetMapping(value = "find-orders")
+    @GetMapping(value = "v1/find-orders")
     public BusinessResp<BasePageResp<FindOrderResp>> findOrders(@RequestBody BasePageReq<FindOrdersReq> req){
 
         BasePageResp<FindOrderResp> resp = facadeOrderService.apiFindOrders(req);
