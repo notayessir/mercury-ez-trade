@@ -1,5 +1,7 @@
 package com.notayessir.user.order.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 public class OrderVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
 
     private Long id;
 
@@ -30,6 +33,7 @@ public class OrderVO implements Serializable {
     private String entrustProp;
 
     private Integer entrustType;
+
 
     private Long coinId;
 
@@ -54,4 +58,7 @@ public class OrderVO implements Serializable {
     private LocalDate tradeDate;
 
     private String matchSequence;
+
+    private String orderStatusDesc;
+    private String entrustTypeDesc;
 }

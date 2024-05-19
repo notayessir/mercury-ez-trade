@@ -16,7 +16,7 @@ import com.notayessir.user.order.mapper.OrderMapper;
 import com.notayessir.user.order.service.IClinchRecordService;
 import com.notayessir.user.order.service.IOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

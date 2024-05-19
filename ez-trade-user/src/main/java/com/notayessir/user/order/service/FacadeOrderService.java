@@ -24,7 +24,7 @@ import com.notayessir.user.coin.bo.CheckCoinResultBO;
 import com.notayessir.user.coin.entity.CoinPair;
 import com.notayessir.user.coin.service.ICoinPairService;
 import com.notayessir.user.common.mq.KafkaMQService;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import com.notayessir.user.order.bo.*;
 import com.notayessir.user.order.constant.EnumOperationStatus;
 import com.notayessir.user.order.constant.EnumOrderStatus;
@@ -406,8 +406,8 @@ public class FacadeOrderService {
         return reqBO;
     }
 
-    public BasePageResp<FindOrderResp> apiFindOrders(BasePageReq<FindOrdersReq> req) {
-        BasePageReq<FindOrdersReqBO> reqBO = toBasePageFindOrdersReq(req);
+    public BasePageResp<FindOrderResp> apiFindOrders(BasePageReq<FindOrderReq> req) {
+        BasePageReq<FindOrdersReqBO> reqBO = toBasePageFindOrderReq(req);
 
         BasePageResp<FindOrderRespBO> respBO = findOrders(reqBO);
 
@@ -443,8 +443,8 @@ public class FacadeOrderService {
     }
 
 
-    private BasePageReq<FindOrdersReqBO> toBasePageFindOrdersReq(BasePageReq<FindOrdersReq> req) {
-        FindOrdersReq query = req.getQuery();
+    private BasePageReq<FindOrdersReqBO> toBasePageFindOrderReq(BasePageReq<FindOrderReq> req) {
+        FindOrderReq query = req.getQuery();
         FindOrdersReqBO queryTarget = new FindOrdersReqBO();
         BeanUtils.copyProperties(query, queryTarget);
 

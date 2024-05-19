@@ -7,9 +7,9 @@ import lombok.Getter;
 public enum EnumCapitalDirection {
 
 
-    FLOW_IN(10, "买入成交"),
+    FLOW_IN(10, "流入"),
 
-    FLOW_OUT(20, "卖出成交")
+    FLOW_OUT(20, "流出")
 
 
     ;

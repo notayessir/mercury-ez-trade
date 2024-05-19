@@ -6,7 +6,7 @@ import com.notayessir.common.web.BusinessException;
 import com.notayessir.user.api.order.constant.EnumEntrustProp;
 import com.notayessir.user.api.order.constant.EnumEntrustSide;
 import com.notayessir.user.api.order.constant.EnumEntrustType;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -4,7 +4,7 @@ package com.notayessir.user.coin.vo;
 import com.notayessir.common.vo.ReqCheck;
 import com.notayessir.common.vo.req.BaseReq;
 import com.notayessir.common.web.BusinessException;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +12,8 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class GetCoinReq extends BaseReq implements ReqCheck {
+public class FindCoinReq extends BaseReq implements ReqCheck {
+
 
 
     private Long id;

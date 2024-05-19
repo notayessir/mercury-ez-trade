@@ -24,4 +24,15 @@ public enum EnumCapitalBusinessCode {
         this.code = code;
         this.desc = desc;
     }
+
+    public static EnumCapitalBusinessCode getByCode(int code){
+        EnumCapitalBusinessCode[] values = EnumCapitalBusinessCode.values();
+        for (EnumCapitalBusinessCode value : values) {
+            if (value.code == code)
+                return value;
+        }
+        return null;
+    }
+
+
 }

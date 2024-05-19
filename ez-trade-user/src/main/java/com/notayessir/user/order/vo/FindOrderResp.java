@@ -1,6 +1,8 @@
 package com.notayessir.user.order.vo;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.notayessir.user.api.order.constant.EnumEntrustType;
+import com.notayessir.user.order.constant.EnumOrderStatus;
 import com.notayessir.user.order.entity.ClinchRecord;
 import com.notayessir.user.order.entity.Order;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class FindOrderResp {
 
     private OrderVO order;
 
-    private List<ClinchRecordVO> clinchRecords = new ArrayList<>(3);
+    private List<ClinchRecordVO> clinchRecords = new ArrayList<>();
 
     public FindOrderResp() {
     }
@@ -27,6 +29,10 @@ public class FindOrderResp {
         if (Objects.nonNull(order)){
             OrderVO orderVO = new OrderVO();
             BeanUtils.copyProperties(order, orderVO);
+            EnumOrderStatus orderStatus = EnumOrderStatus.getEnumOrderStatus(orderVO.getOrderStatus());
+            orderVO.setOrderStatusDesc(orderStatus.getDesc());
+            EnumEntrustType entrustType = EnumEntrustType.getByType(order.getEntrustType());
+            orderVO.setEntrustTypeDesc(entrustType.getDesc());
             this.order = orderVO;
 
             if (CollectionUtil.isNotEmpty(clinchRecords)){

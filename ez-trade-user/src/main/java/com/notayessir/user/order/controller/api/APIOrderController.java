@@ -8,7 +8,6 @@ import com.notayessir.user.order.service.FacadeOrderService;
 import com.notayessir.user.order.vo.PatchOrderReq;
 import com.notayessir.user.order.vo.CreateOrderReq;
 import com.notayessir.user.order.vo.FindOrderReq;
-import com.notayessir.user.order.vo.FindOrdersReq;
 import com.notayessir.user.order.vo.PatchOrderResp;
 import com.notayessir.user.order.vo.CreateOrderResp;
 import com.notayessir.user.order.vo.FindOrderResp;
@@ -40,7 +39,7 @@ public class APIOrderController {
         return BusinessResp.ok();
     }
 
-    @GetMapping(value = "v1/find-order")
+    @PostMapping(value = "v1/find-order")
     public BusinessResp<FindOrderResp> findOrder(@RequestBody FindOrderReq req){
         req.checkAndInit();
 
@@ -49,8 +48,8 @@ public class APIOrderController {
         return BusinessResp.ok(resp);
     }
 
-    @GetMapping(value = "v1/find-orders")
-    public BusinessResp<BasePageResp<FindOrderResp>> findOrders(@RequestBody BasePageReq<FindOrdersReq> req){
+    @PostMapping(value = "v1/find-orders")
+    public BusinessResp<BasePageResp<FindOrderResp>> findOrders(@RequestBody BasePageReq<FindOrderReq> req){
 
         BasePageResp<FindOrderResp> resp = facadeOrderService.apiFindOrders(req);
 

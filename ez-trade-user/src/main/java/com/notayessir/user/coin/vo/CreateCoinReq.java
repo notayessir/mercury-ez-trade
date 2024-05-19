@@ -3,7 +3,7 @@ package com.notayessir.user.coin.vo;
 
 import com.notayessir.common.vo.ReqCheck;
 import com.notayessir.common.web.BusinessException;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;

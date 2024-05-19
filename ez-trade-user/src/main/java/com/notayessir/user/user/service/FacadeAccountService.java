@@ -1,18 +1,16 @@
 package com.notayessir.user.user.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.notayessir.common.constant.EnumRequestSource;
+import com.notayessir.common.vo.req.BasePageReq;
 import com.notayessir.common.vo.resp.BasePageResp;
-import com.notayessir.user.user.bo.DepositReqBO;
-import com.notayessir.user.user.bo.DepositRespBO;
-import com.notayessir.user.user.bo.FindAccountsBO;
-import com.notayessir.user.user.bo.FindAccountRespBO;
+import com.notayessir.user.order.entity.Order;
+import com.notayessir.user.user.bo.*;
 import com.notayessir.user.user.constant.EnumCapitalBusinessCode;
 import com.notayessir.user.user.entity.Account;
-import com.notayessir.user.user.vo.DepositReq;
-import com.notayessir.user.user.vo.DepositResp;
-import com.notayessir.user.user.vo.FindAccountsReq;
-import com.notayessir.user.user.vo.FindAccountResp;
+import com.notayessir.user.user.entity.CapitalRecord;
+import com.notayessir.user.user.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,8 +65,8 @@ public class FacadeAccountService {
         return reqBO;
     }
 
-    public List<FindAccountResp> apiFindAccounts(FindAccountsReq req) {
-        FindAccountsBO reqBO = toViewAssetReqBO(req);
+    public List<FindAccountResp> apiFindAccounts(FindAccountReq req) {
+        FindAccountReqBO reqBO = toFindAccountsBO(req);
 
         List<FindAccountRespBO> resp = findAccounts(reqBO);
 
@@ -92,7 +90,7 @@ public class FacadeAccountService {
         return list;
     }
 
-    private List<FindAccountRespBO> findAccounts(FindAccountsBO reqBO) {
+    private List<FindAccountRespBO> findAccounts(FindAccountReqBO reqBO) {
         List<Account> accounts = iAccountService.getAccounts(reqBO.getUserId());
         return toListFindAccountRespBO(accounts);
     }
@@ -115,13 +113,80 @@ public class FacadeAccountService {
     }
 
 
-    private FindAccountsBO toViewAssetReqBO(FindAccountsReq req) {
-        FindAccountsBO bo = new FindAccountsBO();
+    private FindAccountReqBO toFindAccountsBO(FindAccountReq req) {
+        FindAccountReqBO bo = new FindAccountReqBO();
         bo.setIp(req.getIp());
         bo.setRequestId(req.getRequestId());
         bo.setUserId(req.getUserId());
         bo.setRequestSource(EnumRequestSource.API);
 
         return bo;
+    }
+
+    public BasePageResp<FindCapitalRecordResp> apiFindCapitalRecords(BasePageReq<FindCapitalRecordReq> req) {
+
+
+        BasePageReq<FindCapitalRecordReqBO> reqBO = toPageFindCapitalRecordReqBO(req);
+
+        Page<CapitalRecord> pages = iCapitalRecordService.findCapitalRecords(reqBO);
+
+        return toPageFindCapitalRecordResp(pages);
+    }
+
+    private BasePageResp<FindCapitalRecordResp> toPageFindCapitalRecordResp(Page<CapitalRecord> page) {
+        if (CollectionUtil.isEmpty(page.getRecords())){
+            return new BasePageResp<>();
+        }
+
+        BasePageResp<FindCapitalRecordResp> basePageResp = new BasePageResp<>(page.getTotal(), page.getSize(), page.getCurrent());
+        List<FindCapitalRecordResp> list = toListFindCapitalRecordResp(page.getRecords());
+        basePageResp.setRecords(list);
+        return basePageResp;
+    }
+
+    private BasePageReq<FindCapitalRecordReqBO> toPageFindCapitalRecordReqBO(BasePageReq<FindCapitalRecordReq> req) {
+        BasePageReq<FindCapitalRecordReqBO> pageReq = new BasePageReq<>();
+        pageReq.setPageSize(req.getPageSize());
+        pageReq.setPageNum(req.getPageNum());
+        pageReq.setIp(req.getIp());
+        pageReq.setUserId(req.getUserId());
+        pageReq.setRequestSource(EnumRequestSource.API);
+        pageReq.setRequestId(req.getRequestId());
+
+
+        FindCapitalRecordReqBO reqBO = toFindCapitalRecordReqBO(req.getQuery());
+        pageReq.setQuery(reqBO);
+
+        return pageReq;
+    }
+
+    private List<FindCapitalRecordResp> toListFindCapitalRecordResp(List<CapitalRecord> capitalRecords) {
+        if (CollectionUtil.isEmpty(capitalRecords)){
+            return Collections.emptyList();
+        }
+        List<FindCapitalRecordResp> list = new ArrayList<>(capitalRecords.size());
+        for (CapitalRecord capitalRecord : capitalRecords) {
+            FindCapitalRecordResp target = new FindCapitalRecordResp();
+            target.setId(capitalRecord.getId());
+            target.setNum(capitalRecord.getNum());
+            target.setDirection(capitalRecord.getDirection());
+            target.setBusinessCode(capitalRecord.getBusinessCode());
+            EnumCapitalBusinessCode businessCode = EnumCapitalBusinessCode.getByCode(capitalRecord.getBusinessCode());
+            target.setBusinessCodeDesc(businessCode.getDesc());
+            target.setCreateTime(capitalRecord.getCreateTime());
+            target.setCurrency(capitalRecord.getCurrency());
+            list.add(target);
+        }
+        return list;
+    }
+
+    private FindCapitalRecordReqBO toFindCapitalRecordReqBO(FindCapitalRecordReq req) {
+        FindCapitalRecordReqBO reqBO = new FindCapitalRecordReqBO();
+        reqBO.setIp(req.getIp());
+        reqBO.setRequestId(req.getRequestId());
+        reqBO.setRequestSource(EnumRequestSource.API);
+        reqBO.setUserId(req.getUserId());
+        reqBO.setCurrency(req.getCurrency());
+        return reqBO;
     }
 }

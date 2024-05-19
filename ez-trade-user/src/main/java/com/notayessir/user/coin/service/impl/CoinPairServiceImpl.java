@@ -6,12 +6,12 @@ import com.notayessir.common.vo.req.BasePageReq;
 import com.notayessir.common.web.BusinessException;
 import com.notayessir.user.api.order.constant.EnumEntrustType;
 import com.notayessir.user.coin.bo.CheckCoinResultBO;
-import com.notayessir.user.coin.bo.GetCoinReqBO;
+import com.notayessir.user.coin.bo.FindCoinReqBO;
 import com.notayessir.user.coin.entity.CoinPair;
 import com.notayessir.user.coin.mapper.CoinPairMapper;
 import com.notayessir.user.coin.service.ICoinPairService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import com.notayessir.user.order.bo.CreateOrderReqBO;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class CoinPairServiceImpl extends ServiceImpl<CoinPairMapper, CoinPair> i
     }
 
     @Override
-    public Page<CoinPair> getCoins(BasePageReq<GetCoinReqBO> req) {
+    public Page<CoinPair> getCoins(BasePageReq<FindCoinReqBO> req) {
         Page<CoinPair> iPage = Page.of(req.getPageNum(), req.getPageSize());
         LambdaQueryWrapper<CoinPair> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper

@@ -1,4 +1,4 @@
-package com.notayessir.user.common.vo;
+package com.notayessir.user.common.constant;
 
 import lombok.Getter;
 

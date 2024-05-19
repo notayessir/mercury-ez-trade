@@ -8,21 +8,21 @@ import java.util.List;
 @Getter
 public enum EnumOrderStatus {
 
-    CANCELLED(-20, "order cancelled", false),
+    CANCELLED(-20, "订单已取消", false),
 
-    CANCELLING(-10, "order cancelling", false),
+    CANCELLING(-10, "订单取消中", false),
 
-    CREATE(10, "order created", true),
+    CREATE(10, "订单已创建", true),
 
-    SUBMITTED(15, "submitted", false),
+    SUBMITTED(15, "订单已提交", false),
 
-    TO_FILL(20, "order to clinch", true),
+    TO_FILL(20, "订单待成交", true),
 
-    PARTIAL_FILLED(30, "order clinched partially", true),
+    PARTIAL_FILLED(30, "订单部分成交", true),
 
-    PARTIAL_FILLED_AND_CANCEL(40, "order clinched partially and cancelled", false),
+    PARTIAL_FILLED_AND_CANCEL(40, "订单成交已取消", false),
 
-    FILLED(50, "order clinched", false),
+    FILLED(50, "订单已成交", false),
 
 
     ;

@@ -5,6 +5,17 @@ server:
 spring:
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - "GET"
+              - "POST"
+              - "OPTIONS"
+            allowedHeaders: "*"
+            allowedCredentials: true
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s

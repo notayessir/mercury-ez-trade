@@ -21,8 +21,8 @@ public class PubKlineController {
     @Autowired
     private FacadeSpotQuoteService facadeSpotQuoteService;
 
-    @GetMapping(value = "v1/get-kline")
-    public BusinessResp<BasePageResp<GetKlineResp>> getKline(@RequestBody BasePageReq<GetKlineReq> req){
+    @GetMapping(value = "v1/find-kline")
+    public BusinessResp<BasePageResp<GetKlineResp>> findKline(@RequestBody BasePageReq<GetKlineReq> req){
         req.getQuery().checkAndInit();
 
         BasePageResp<GetKlineResp> resp = facadeSpotQuoteService.publicApiFindKline(req);

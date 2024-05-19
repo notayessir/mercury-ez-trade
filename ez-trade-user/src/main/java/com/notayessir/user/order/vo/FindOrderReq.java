@@ -4,7 +4,7 @@ package com.notayessir.user.order.vo;
 import com.notayessir.common.vo.ReqCheck;
 import com.notayessir.common.vo.req.BaseReq;
 import com.notayessir.common.web.BusinessException;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import lombok.Getter;
 import lombok.Setter;
 

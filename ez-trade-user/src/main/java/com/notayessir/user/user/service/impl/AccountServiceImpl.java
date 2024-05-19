@@ -13,7 +13,7 @@ import com.notayessir.user.user.entity.Account;
 import com.notayessir.user.user.mapper.AccountMapper;
 import com.notayessir.user.user.service.IAccountService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.notayessir.user.common.vo.EnumUserResponse;
+import com.notayessir.user.common.constant.EnumUserResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 

@@ -229,7 +229,7 @@ public class FacadeSpotQuoteService {
         GetKlineReqBO targetQ = new GetKlineReqBO();
         targetQ.setRequestSource(EnumRequestSource.PUBLIC_API);
         targetQ.setInterval(sourceQ.getInterval());
-        targetQ.setSymbol(sourceQ.getSymbol());
+        targetQ.setCoinId(sourceQ.getCoinId());
 
         target.setQuery(targetQ);
         return target;

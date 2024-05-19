@@ -1,4 +1,4 @@
-package com.notayessir.user.coin.bo;
+package com.notayessir.user.user.vo;
 
 
 import com.notayessir.common.vo.req.BaseReq;
@@ -7,10 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class GetCoinReqBO extends BaseReq {
-
-
-    private Long id;
+public class FindAccountReq extends BaseReq  {
 
 
 }

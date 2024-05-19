@@ -10,7 +10,6 @@ import lombok.Setter;
 public class GetKlineReqBO extends BaseReq {
 
 
-    private String symbol;
 
     private Long coinId;
 

@@ -1,6 +1,7 @@
 package com.notayessir.user.coin.service;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.notayessir.common.constant.EnumFieldDeleted;
@@ -10,13 +11,16 @@ import com.notayessir.common.vo.req.BasePageReq;
 import com.notayessir.common.vo.resp.BasePageResp;
 import com.notayessir.user.coin.bo.CreateCoinReqBO;
 import com.notayessir.user.coin.bo.CreateCoinRespBO;
-import com.notayessir.user.coin.bo.GetCoinReqBO;
-import com.notayessir.user.coin.bo.GetCoinRespBO;
+import com.notayessir.user.coin.bo.FindCoinReqBO;
+import com.notayessir.user.coin.bo.FindCoinRespBO;
 import com.notayessir.user.coin.entity.CoinPair;
 import com.notayessir.user.coin.vo.CreateCoinReq;
-import com.notayessir.user.coin.vo.GetCoinReq;
+import com.notayessir.user.coin.vo.FindCoinReq;
 import com.notayessir.user.coin.vo.CreateCoinResp;
-import com.notayessir.user.coin.vo.GetCoinResp;
+import com.notayessir.user.coin.vo.FindCoinResp;
+import com.notayessir.user.order.bo.FindOrderRespBO;
+import com.notayessir.user.order.vo.FindOrderResp;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,10 +64,10 @@ public class FacadeCoinService {
 
 
 
-    private BasePageResp<GetCoinRespBO> toPageGetCoinResp(Page<CoinPair> page) {
-        List<GetCoinRespBO> list = new ArrayList<>(page.getRecords().size());
+    private BasePageResp<FindCoinRespBO> toPageGetCoinResp(Page<CoinPair> page) {
+        List<FindCoinRespBO> list = new ArrayList<>(page.getRecords().size());
         for (CoinPair coinPair : page.getRecords()){
-            GetCoinRespBO target = new GetCoinRespBO();
+            FindCoinRespBO target = new FindCoinRespBO();
             target.setBaseCurrency(coinPair.getBaseCurrency());
             target.setBaseMaxQty(coinPair.getBaseMaxQty());
             target.setBaseMinQty(coinPair.getBaseMinQty());
@@ -76,7 +80,7 @@ public class FacadeCoinService {
             list.add(target);
         }
 
-        BasePageResp<GetCoinRespBO> resp = new BasePageResp<>();
+        BasePageResp<FindCoinRespBO> resp = new BasePageResp<>();
         resp.setCurrent(page.getCurrent());
         resp.setSize(page.getSize());
         resp.setTotal(page.getTotal());
@@ -115,53 +119,73 @@ public class FacadeCoinService {
         return reqBO;
     }
 
-    public BasePageResp<GetCoinResp> publicApiGetCoinPair(BasePageReq<GetCoinReq> pageReq) {
-        BasePageReq<GetCoinReqBO> page = toBasePageReqGetCoinReqBO(pageReq);
+    public BasePageResp<FindCoinResp> publicApiGetCoinPair(BasePageReq<FindCoinReq> pageReq) {
+        BasePageReq<FindCoinReqBO> page = toBasePageReqGetCoinReqBO(pageReq);
 
-        BasePageResp<GetCoinRespBO> pageResp = getCoinPair(page);
+        BasePageResp<FindCoinRespBO> pageResp = getCoinPair(page);
 
         return toBasePageRespGetProductResp(pageResp);
     }
 
-    private BasePageResp<GetCoinResp> toBasePageRespGetProductResp(BasePageResp<GetCoinRespBO> pageResp) {
-        return null;
+    private BasePageResp<FindCoinResp> toBasePageRespGetProductResp(BasePageResp<FindCoinRespBO> pageResp) {
+        BasePageResp<FindCoinResp> target = new BasePageResp<>();
+        BeanUtils.copyProperties(pageResp, target);
+        List<FindCoinRespBO> records = pageResp.getRecords();
+        if (CollectionUtil.isNotEmpty(records)){
+            List<FindCoinResp> list = new ArrayList<>(records.size());
+            for (FindCoinRespBO record : records) {
+                list.add(new FindCoinResp(record));
+            }
+            target.setRecords(list);
+        }
+        return target;
     }
 
-    private BasePageResp<GetCoinRespBO> getCoinPair(BasePageReq<GetCoinReqBO> req) {
+    private BasePageResp<FindCoinRespBO> getCoinPair(BasePageReq<FindCoinReqBO> req) {
         Page<CoinPair> page = iCoinPairService.getCoins(req);
-        return toPageGetCoinResp(page);
+
+        BasePageResp<FindCoinRespBO> resp = new BasePageResp<>(page.getTotal(), page.getSize(), page.getCurrent());
+        List<CoinPair> records = page.getRecords();
+        if (CollectionUtil.isNotEmpty(records)){
+            List<FindCoinRespBO> list = new ArrayList<>(records.size());
+            for (CoinPair record : records) {
+                list.add(new FindCoinRespBO(record));
+            }
+            resp.setRecords(list);
+        }
+        return resp;
     }
 
-    private BasePageReq<GetCoinReqBO> toBasePageReqGetCoinReqBO(BasePageReq<GetCoinReq> pageReq) {
-        BasePageReq<GetCoinReqBO> target = new BasePageReq<>();
+    private BasePageReq<FindCoinReqBO> toBasePageReqGetCoinReqBO(BasePageReq<FindCoinReq> pageReq) {
+        BasePageReq<FindCoinReqBO> target = new BasePageReq<>();
         target.setPageNum(pageReq.getPageNum());
         target.setIp(pageReq.getIp());
         target.setUserId(pageReq.getUserId());
         target.setPageSize(pageReq.getPageSize());
         target.setRequestId(pageReq.getRequestId());
 
-        GetCoinReqBO query = new GetCoinReqBO();
+        FindCoinReqBO query = new FindCoinReqBO();
         query.setRequestSource(EnumRequestSource.PUBLIC_API);
         target.setQuery(query);
         return target;
     }
 
 
-    public GetCoinResp publicApiGetCoinPair(GetCoinReq req) {
-        GetCoinReqBO reqBO = toGetCoinReqBO(req);
+    public FindCoinResp publicApiGetCoinPair(FindCoinReq req) {
+        FindCoinReqBO reqBO = toGetCoinReqBO(req);
 
-        GetCoinRespBO respBO = getCoinPair(reqBO);
+        FindCoinRespBO respBO = getCoinPair(reqBO);
 
-        return toGetCoinResp(respBO);
+        return new FindCoinResp(respBO);
     }
 
-    private GetCoinRespBO getCoinPair(GetCoinReqBO reqBO) {
+    private FindCoinRespBO getCoinPair(FindCoinReqBO reqBO) {
         CoinPair coinPair = iCoinPairService.getById(reqBO.getId());
         return toGetCoinRespBO(coinPair);
     }
 
-    private GetCoinRespBO toGetCoinRespBO(CoinPair product) {
-        GetCoinRespBO target = new GetCoinRespBO();
+    private FindCoinRespBO toGetCoinRespBO(CoinPair product) {
+        FindCoinRespBO target = new FindCoinRespBO();
         target.setId(product.getId());
         target.setBaseCurrency(product.getBaseCurrency());
         target.setBaseMaxQty(product.getBaseMaxQty());
@@ -175,25 +199,11 @@ public class FacadeCoinService {
         return target;
     }
 
-    private GetCoinReqBO toGetCoinReqBO(GetCoinReq req) {
-        GetCoinReqBO reqBO = new GetCoinReqBO();
+    private FindCoinReqBO toGetCoinReqBO(FindCoinReq req) {
+        FindCoinReqBO reqBO = new FindCoinReqBO();
         reqBO.setId(req.getId());
         reqBO.setRequestSource(EnumRequestSource.PUBLIC_API);
         return reqBO;
     }
 
-    private GetCoinResp toGetCoinResp(GetCoinRespBO source) {
-        GetCoinResp target = new GetCoinResp();
-        target.setId(source.getId());
-        target.setBaseCurrency(source.getBaseCurrency());
-        target.setBaseMaxQty(source.getBaseMaxQty());
-        target.setBaseMinQty(source.getBaseMinQty());
-        target.setBaseScale(source.getBaseScale());
-
-        target.setQuoteCurrency(source.getQuoteCurrency());
-        target.setQuoteScale(source.getQuoteScale());
-        target.setBaseMaxQty(source.getQuoteMaxQty());
-        target.setBaseMinQty(source.getQuoteMinQty());
-        return target;
-    }
 }
