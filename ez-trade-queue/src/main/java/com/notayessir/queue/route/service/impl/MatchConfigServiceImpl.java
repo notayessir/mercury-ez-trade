@@ -7,13 +7,14 @@ import com.notayessir.queue.route.service.IMatchConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MatchConfigServiceImpl extends ServiceImpl<MatchConfigMapper, MatchConfig> implements IMatchConfigService {
 
+
     @Override
-    public MatchConfig findByName(String routeTo) {
-        LambdaQueryWrapper<MatchConfig> qw = new LambdaQueryWrapper<>();
-        qw.eq(MatchConfig::getName, routeTo);
-        return getOne(qw);
+    public List<MatchConfig> findAllMatchConfigs() {
+        return list();
     }
 }

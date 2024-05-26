@@ -43,6 +43,8 @@ public class OrderCreateCompensateTask {
 
         } catch (Exception e){
             logger.error("fail to compensate order:", e);
+        } finally {
+            lock.unlock();
         }
 
     }

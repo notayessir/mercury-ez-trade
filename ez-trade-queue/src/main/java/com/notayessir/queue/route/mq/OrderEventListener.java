@@ -31,8 +31,7 @@ public class OrderEventListener {
 
 
 
-    @KafkaListener(groupId = GROUP_ID, topics = OrderTopic.CREATE_ORDER_EVENT_TOPIC,
-            concurrency = "3")
+    @KafkaListener(groupId = GROUP_ID, topics = OrderTopic.CREATE_ORDER_EVENT_TOPIC, concurrency = "3")
     public void handleOrderEvent(ConsumerRecord<String, String> record, Acknowledgment ack) {
         String key = record.key();
         long offset = record.offset();

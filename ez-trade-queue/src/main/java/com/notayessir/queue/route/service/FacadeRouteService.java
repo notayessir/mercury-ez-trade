@@ -24,6 +24,7 @@ import com.notayessir.user.api.order.constant.EnumEntrustSide;
 import com.notayessir.user.api.order.mq.OrderEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,10 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Slf4j
 public class FacadeRouteService {
 
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private IRouteInfoService iRouteInfoService;
@@ -60,17 +61,16 @@ public class FacadeRouteService {
 
     @PostConstruct
     public void init(){
-        List<RouteInfo> list = iRouteInfoService.list();
-        if (CollectionUtil.isEmpty(list)){
-            logger.warn("empty route info.");
+        List<MatchConfig> matchConfigs = iMatchConfigService.findAllMatchConfigs();
+        if (CollectionUtil.isEmpty(matchConfigs)){
+            log.info("matchConfigs is empty.");
             return;
         }
-        for (RouteInfo routeInfo : list) {
-            MatchConfig matchConfig = iMatchConfigService.findByName(routeInfo.getRouteTo());
+        for (MatchConfig matchConfig : matchConfigs) {
             if (clientMap.containsKey(matchConfig.getName())){
                 continue;
             }
-            List<String> addresses = Arrays.asList(matchConfig.getGroupAddress().split("[,;]"));
+            List<String> addresses = Arrays.asList(matchConfig.getGroupAddress().split("[,;|]"));
             MatchClientConfig config = MatchClientConfig.builder()
                     .addresses(addresses).groupId(matchConfig.getGroupId())
                     .build();
@@ -89,7 +89,7 @@ public class FacadeRouteService {
                 client.close();
             }
         }catch (IOException e){
-            logger.warn("fail to close client.");
+            log.warn("fail to close client.");
         }
     }
 
@@ -110,6 +110,7 @@ public class FacadeRouteService {
 
     public void handleOrderEvent(OrderEvent event) {
         if (iRequestRecordService.countRequestRecord(event.getRequestId()) > 0){
+            // TODO send alarm
             return;
         }
         RequestRecord requestRecord = buildRequestRecord(event);
@@ -123,7 +124,7 @@ public class FacadeRouteService {
     private Long doHandleOrderEvent(OrderEvent event) {
         RouteInfo routeInfo = iRouteInfoService.findByCoinId(event.getCoinId());
         if (Objects.isNull(routeInfo)){
-            logger.warn("no route info about coin id:{}", event.getCoinId());
+            log.warn("no route info about coin id:{}", event.getCoinId());
             throw new BusinessException(EnumResponseOfQueue.ROUTE_NOT_EXIST.getCode(), EnumResponseOfQueue.ROUTE_NOT_EXIST.getMessage());
         }
         // route info seem as a load balance
@@ -139,7 +140,7 @@ public class FacadeRouteService {
             return result ;
         }catch (Exception e){
             // catching A ex means match engine has something error internal
-            logger.warn("error occur when send command to match engine:{}", event.getCoinId(), e);
+            log.warn("error occur when send command to match engine:{}", event.getCoinId(), e);
             throw new BusinessException(EnumResponseOfQueue.FAIL_TO_ROUTE.getCode(), EnumResponseOfQueue.FAIL_TO_ROUTE.getMessage());
 
         }

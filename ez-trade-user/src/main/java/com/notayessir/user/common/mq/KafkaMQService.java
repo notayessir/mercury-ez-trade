@@ -25,8 +25,10 @@ public class KafkaMQService {
 
 
     public boolean sendMessage(String topic, OrderEvent event){
+        String jsonString = JSONObject.toJSONString(event);
+        log.info(jsonString);
         ProducerRecord<String, String> record
-                = new ProducerRecord<>(topic, event.getCoinId().toString(), JSONObject.toJSONString(event));
+                = new ProducerRecord<>(topic, event.getCoinId().toString(), jsonString);
         CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(record);
         AtomicBoolean success = new AtomicBoolean(true);
         future.whenComplete((result, ex) -> {

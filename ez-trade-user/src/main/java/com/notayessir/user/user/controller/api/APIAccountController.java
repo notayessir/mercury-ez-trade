@@ -18,14 +18,6 @@ public class APIAccountController {
     @Autowired
     private FacadeAccountService facadeAccountService;
 
-    @PostMapping("v1/deposit")
-    public BusinessResp<Void> apiDeposit(@RequestBody DepositReq req){
-        req.checkAndInit();
-
-        DepositResp resp = facadeAccountService.apiDeposit(req);
-
-        return BusinessResp.ok();
-    }
 
 
     @PostMapping("v1/find-accounts")
