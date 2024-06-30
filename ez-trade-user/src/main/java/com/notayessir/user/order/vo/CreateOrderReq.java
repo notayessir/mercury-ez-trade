@@ -9,6 +9,7 @@ import com.notayessir.user.api.order.constant.EnumEntrustType;
 import com.notayessir.user.common.constant.EnumUserResponse;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -66,54 +67,62 @@ public class CreateOrderReq extends BaseReq implements ReqCheck {
     @Override
     public void checkAndInit() {
         if (Objects.isNull(coinId)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field coinId is blank");
         }
         EnumEntrustSide entrustSide = EnumEntrustSide.getEntrustSide(side);
         if (Objects.isNull(entrustSide)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field side is blank");
         }
 //        if (Objects.isNull(basePrice)){
 //            throw new BusinessException(EnumResponseOfUser.PARAM_BLANK.getCode(), EnumResponseOfUser.PARAM_BLANK.getMessage());
 //        }
 
         if (entrustType == EnumEntrustType.MARKET.getType()){
-            checkMarketOrder();
-            entrustQty = BigDecimal.ZERO;
+            initMarketOrderParam();
             entrustPrice = BigDecimal.ZERO;
         } else if (entrustType == EnumEntrustType.NORMAL_LIMIT.getType() || entrustType == EnumEntrustType.PREMIUM_LIMIT.getType()){
-            checkLimitOrder();
+            initLimitOrderParam();
+
             if (entrustType == EnumEntrustType.PREMIUM_LIMIT.getType()){
                 EnumEntrustProp prop = EnumEntrustProp.getByType(entrustProp);
                 if (Objects.isNull(prop)){
-                    throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+                    throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustProp is blank");
                 }
             }
 
-            // assign the entrustAmount
-            entrustAmount = entrustPrice.multiply(entrustQty);
-
         } else {
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustType is blank");
 
         }
 
     }
 
-    private void checkLimitOrder() {
+    private void initLimitOrderParam() {
         if (Objects.isNull(entrustQty) || entrustQty.compareTo(BigDecimal.ZERO) <= 0){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
-
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustQty is invalid");
         }
         if (Objects.isNull(entrustPrice) || entrustPrice.compareTo(BigDecimal.ZERO) <= 0){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
-
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustPrice is invalid");
         }
+        // assign the entrustAmount
+        entrustAmount = entrustPrice.multiply(entrustQty);
     }
 
-    private void checkMarketOrder() {
-        if (Objects.isNull(entrustAmount) || entrustAmount.compareTo(BigDecimal.ZERO) <= 0){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+    private void initMarketOrderParam() {
+        if (StringUtils.equalsIgnoreCase(EnumEntrustSide.SELL.getSide(), side)){
+            // SELL
+            if (Objects.isNull(entrustQty) || entrustQty.compareTo(BigDecimal.ZERO) <= 0){
+                throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustQty is invalid");
+            }
+            entrustAmount = BigDecimal.ZERO;
+        } else {
+            // BUY
+            if (Objects.isNull(entrustAmount) || entrustAmount.compareTo(BigDecimal.ZERO) <= 0){
+                throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field entrustAmount is invalid");
+            }
+            entrustQty = BigDecimal.ZERO;
         }
+
     }
 
 

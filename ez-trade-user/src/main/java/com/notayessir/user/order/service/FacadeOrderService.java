@@ -234,10 +234,7 @@ public class FacadeOrderService {
                 iAccountService.moveHoldToAvailable(account, new BigDecimal(order.getEntrustAmount()));
                 iOrderService.cancelOrder(order);
             });
-            return CancelOrderRespBO.builder().orderId(req.getOrderId()).build();
-        }
-
-        if (EnumOrderStatus.isProcessingStatus(orderStatus)) {
+        } else if (EnumOrderStatus.isProcessingStatus(orderStatus)) {
             // notify match engine to cancel the order
             MqRecord mqRecord = buildCancellingMqRecord(order);
             iMqRecordService.createMqRecord(mqRecord);
@@ -246,16 +243,16 @@ public class FacadeOrderService {
                     .command(EnumMatchCommand.CANCEL.getCode())
                     .timestamp(System.currentTimeMillis())
                     .requestId(mqRecord.getId())
+                    .entrustSide(order.getEntrustSide())
                     .coinId(order.getCoinId())
                     .build();
-            boolean success = kafkaMQService.sendMessage(OrderTopic.CREATE_ORDER_EVENT_TOPIC, event);
+            kafkaMQService.sendMessage(OrderTopic.CREATE_ORDER_EVENT_TOPIC, event);
             txTemplate.executeWithoutResult(transactionStatus -> {
                 iOrderService.cancellingOrder(order);
                 iMqRecordService.finishMqRecord(mqRecord);
             });
-
         }
-        throw new BusinessException(EnumUserResponse.ORDER_CANCELLING.getCode(), EnumUserResponse.ORDER_CANCELLING.getMessage());
+        return CancelOrderRespBO.builder().orderId(req.getOrderId()).build();
     }
 
     private MqRecord buildCancellingMqRecord(Order order) {
@@ -348,7 +345,7 @@ public class FacadeOrderService {
         return reqBO;
     }
 
-    public PatchOrderResp apiCancelOrder(PatchOrderReq req) {
+    public CancelOrderResp apiCancelOrder(CancelOrderReq req) {
         // default patch code is cancel
         CancelOrderReqBO reqBO = toCancelOrderReqBO(req);
 
@@ -358,13 +355,13 @@ public class FacadeOrderService {
 
     }
 
-    private PatchOrderResp toCancelOrderResp(CancelOrderRespBO respBO) {
-        PatchOrderResp resp = new PatchOrderResp();
+    private CancelOrderResp toCancelOrderResp(CancelOrderRespBO respBO) {
+        CancelOrderResp resp = new CancelOrderResp();
         resp.setOrderId(respBO.getOrderId());
         return resp;
     }
 
-    private CancelOrderReqBO toCancelOrderReqBO(PatchOrderReq req) {
+    private CancelOrderReqBO toCancelOrderReqBO(CancelOrderReq req) {
         CancelOrderReqBO reqBO = new CancelOrderReqBO();
         reqBO.setIp(req.getIp());
         reqBO.setRequestId(req.getRequestId());

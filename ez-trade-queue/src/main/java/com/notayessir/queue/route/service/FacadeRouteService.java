@@ -25,8 +25,6 @@ import com.notayessir.user.api.order.mq.OrderEvent;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -63,7 +61,7 @@ public class FacadeRouteService {
     public void init(){
         List<MatchConfig> matchConfigs = iMatchConfigService.findAllMatchConfigs();
         if (CollectionUtil.isEmpty(matchConfigs)){
-            log.info("matchConfigs is empty.");
+            log.info("match configs are empty.");
             return;
         }
         for (MatchConfig matchConfig : matchConfigs) {
@@ -77,6 +75,7 @@ public class FacadeRouteService {
             MatchClient matchClient = new MatchClient(config);
             matchClient.connect();
             clientMap.put(matchConfig.getName(), matchClient);
+            log.info("successfully initialized match config: {}", JSONObject.toJSONString(matchConfig));
         }
 
     }

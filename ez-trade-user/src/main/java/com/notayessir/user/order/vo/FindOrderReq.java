@@ -18,10 +18,10 @@ public class FindOrderReq extends BaseReq implements ReqCheck {
     @Override
     public void checkAndInit() {
         if (Objects.isNull(orderId)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field orderId is blank");
         }
         if (Objects.isNull(userId)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field userId is blank");
         }
     }
 }

@@ -7,10 +7,9 @@ import com.notayessir.common.vo.BusinessRespCode;
 import com.notayessir.user.api.order.constant.EnumEntrustProp;
 import com.notayessir.user.api.order.constant.EnumEntrustSide;
 import com.notayessir.user.api.order.constant.EnumEntrustType;
-import com.notayessir.user.coin.controller.admin.AdminCoinController;
 import com.notayessir.user.order.vo.CreateOrderReq;
 import com.notayessir.user.order.vo.CreateOrderResp;
-import com.notayessir.user.order.vo.PatchOrderReq;
+import com.notayessir.user.order.vo.CancelOrderReq;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,7 @@ public class APIOrderControllerTests {
         Assumptions.assumeTrue(Objects.nonNull(orderId));
 
         // cancel order
-        PatchOrderReq req1 = new PatchOrderReq();
+        CancelOrderReq req1 = new CancelOrderReq();
         req1.setOrderId(orderId);
         BusinessResp<Void> patchedOrderResp = controller.cancelOrder(req1);
         Assumptions.assumeTrue(StringUtils.equals(patchedOrderResp.getCode(), BusinessRespCode.SUCCESS.getCode()));

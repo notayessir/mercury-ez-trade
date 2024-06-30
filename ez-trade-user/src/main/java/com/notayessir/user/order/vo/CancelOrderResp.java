@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PatchOrderResp {
+public class CancelOrderResp {
 
     private Long orderId;
 

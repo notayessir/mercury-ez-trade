@@ -12,7 +12,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public class PatchOrderReq extends BaseReq implements ReqCheck {
+public class CancelOrderReq extends BaseReq implements ReqCheck {
 
 
     private Long orderId;
@@ -20,10 +20,10 @@ public class PatchOrderReq extends BaseReq implements ReqCheck {
     @Override
     public void checkAndInit() {
         if (Objects.isNull(orderId)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field orderId is blank");
         }
         if (Objects.isNull(userId)){
-            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), EnumUserResponse.PARAM_BLANK.getMessage());
+            throw new BusinessException(EnumUserResponse.PARAM_BLANK.getCode(), "field userId is blank");
         }
     }
 }

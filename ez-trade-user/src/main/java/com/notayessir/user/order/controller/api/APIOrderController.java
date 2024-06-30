@@ -5,10 +5,10 @@ import com.notayessir.common.vo.BusinessResp;
 import com.notayessir.common.vo.req.BasePageReq;
 import com.notayessir.common.vo.resp.BasePageResp;
 import com.notayessir.user.order.service.FacadeOrderService;
-import com.notayessir.user.order.vo.PatchOrderReq;
+import com.notayessir.user.order.vo.CancelOrderReq;
 import com.notayessir.user.order.vo.CreateOrderReq;
 import com.notayessir.user.order.vo.FindOrderReq;
-import com.notayessir.user.order.vo.PatchOrderResp;
+import com.notayessir.user.order.vo.CancelOrderResp;
 import com.notayessir.user.order.vo.CreateOrderResp;
 import com.notayessir.user.order.vo.FindOrderResp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +31,10 @@ public class APIOrderController {
     }
 
     @PostMapping(value = "v1/cancel-order")
-    public BusinessResp<Void> cancelOrder(@RequestBody PatchOrderReq req){
+    public BusinessResp<Void> cancelOrder(@RequestBody CancelOrderReq req){
         req.checkAndInit();
 
-        PatchOrderResp resp = facadeOrderService.apiCancelOrder(req);
+        CancelOrderResp resp = facadeOrderService.apiCancelOrder(req);
 
         return BusinessResp.ok();
     }

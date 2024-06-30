@@ -15,6 +15,6 @@ public class BaseReq {
 
     protected String requestId;
 
-    protected EnumRequestSource requestSource;
+    protected transient EnumRequestSource requestSource;
 
 }
