@@ -7,6 +7,8 @@ import com.notayessir.bo.MatchItemBO;
 import com.notayessir.common.constant.EnumFieldVersion;
 import com.notayessir.common.vo.req.BasePageReq;
 import com.notayessir.common.web.BusinessException;
+import com.notayessir.user.api.order.constant.EnumEntrustSide;
+import com.notayessir.user.api.order.constant.EnumEntrustType;
 import com.notayessir.user.order.bo.FindOrdersReqBO;
 import com.notayessir.user.order.constant.EnumOrderRole;
 import com.notayessir.user.order.constant.EnumOrderStatus;
@@ -17,6 +19,7 @@ import com.notayessir.user.order.service.IClinchRecordService;
 import com.notayessir.user.order.service.IOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.notayessir.user.common.constant.EnumUserResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -155,6 +158,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         if (entrustQty.compareTo(clinchQty) == 0){
             status = EnumOrderStatus.FILLED;
         }
+
+        // market order always end with 'filled' status
+        if (EnumEntrustType.MARKET.getType() == order.getEntrustType()){
+            status = EnumOrderStatus.FILLED;
+        }
+
         order.setOrderStatus(status.getCode());
         order.setUpdateTime(LocalDateTime.now());
         // update order

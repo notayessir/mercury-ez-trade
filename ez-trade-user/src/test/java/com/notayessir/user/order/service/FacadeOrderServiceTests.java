@@ -59,7 +59,7 @@ public class FacadeOrderServiceTests {
         sellReq.setEntrustPrice(new BigDecimal(90));
         sellReq.setEntrustQty(new BigDecimal(2));
         sellReq.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        BusinessResp<CreateOrderResp> resp = controller.createOrder(sellReq);
+        BusinessResp<CreateOrderResp> resp = controller.createOrder("",sellReq);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long sellOrderId = resp.getData().getOrderId();
 
@@ -73,7 +73,7 @@ public class FacadeOrderServiceTests {
         buyReq.setEntrustPrice(new BigDecimal(90));
         buyReq.setEntrustQty(new BigDecimal(2));
         buyReq.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        resp = controller.createOrder(buyReq);
+        resp = controller.createOrder("",buyReq);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long buyOrderId = resp.getData().getOrderId();
 
@@ -139,7 +139,7 @@ public class FacadeOrderServiceTests {
         sellReq.setEntrustPrice(new BigDecimal(90));
         sellReq.setEntrustQty(new BigDecimal(1));
         sellReq.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        BusinessResp<CreateOrderResp> resp = controller.createOrder(sellReq);
+        BusinessResp<CreateOrderResp> resp = controller.createOrder("",sellReq);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long sellOrderId = resp.getData().getOrderId();
 
@@ -154,7 +154,7 @@ public class FacadeOrderServiceTests {
         sellReq1.setEntrustPrice(new BigDecimal(90));
         sellReq1.setEntrustQty(new BigDecimal(1));
         sellReq1.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        resp = controller.createOrder(sellReq1);
+        resp = controller.createOrder("",sellReq1);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long sellOrderId1 = resp.getData().getOrderId();
 
@@ -168,7 +168,7 @@ public class FacadeOrderServiceTests {
         buyReq.setEntrustPrice(new BigDecimal(90));
         buyReq.setEntrustQty(new BigDecimal(2));
         buyReq.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        resp = controller.createOrder(buyReq);
+        resp = controller.createOrder("",buyReq);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long buyOrderId = resp.getData().getOrderId();
 

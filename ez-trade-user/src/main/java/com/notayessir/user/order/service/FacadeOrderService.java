@@ -274,6 +274,7 @@ public class FacadeOrderService {
     public void handleOrderExecutedEvent(MatchResultBO event) {
         // unique key: global_sequence
         if (iClinchSequenceService.countClinchSequence(event.getGlobalSequence()) > 0){
+            log.warn("clinch sequence already exist: {}", event.getGlobalSequence());
             return;
         }
 

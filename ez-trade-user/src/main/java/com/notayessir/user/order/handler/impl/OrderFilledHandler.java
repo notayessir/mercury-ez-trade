@@ -4,12 +4,14 @@ import com.notayessir.bo.MatchItemBO;
 import com.notayessir.bo.MatchResultBO;
 import com.notayessir.bo.OrderItemBO;
 import com.notayessir.user.api.order.constant.EnumEntrustSide;
+import com.notayessir.user.api.order.constant.EnumEntrustType;
 import com.notayessir.user.order.constant.EnumOrderStatus;
 import com.notayessir.user.order.entity.Order;
 import com.notayessir.user.order.handler.OrderCommonHandler;
 import com.notayessir.user.order.handler.OrderExecutedHandler;
 import com.notayessir.user.order.service.IOrderService;
 import com.notayessir.user.user.service.IAccountService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +33,6 @@ public class OrderFilledHandler implements OrderExecutedHandler {
 
     @Override
     public void handle(MatchResultBO event) {
-//        Integer commandType = event.getCommandType();
-//        if (!commandType.equals(EnumMatchCommand.PLACE.getCode())){
-//            return;
-//        }
-        OrderItemBO takerOrder = event.getTakerOrder();
-        Integer matchStatus = takerOrder.getMatchStatus();
 
 
         // 1. handle taker
@@ -91,11 +87,6 @@ public class OrderFilledHandler implements OrderExecutedHandler {
     private void handleTaker(MatchResultBO event) {
         BigDecimal qty = event.gatherClinchQty();
         BigDecimal amount = event.gatherClinchAmount();
-//        for (MatchItemBO matchItem : event.getMatchItems()) {
-//            qty = qty.add(matchItem.getClinchQty());
-//            amount = amount.add(matchItem.getClinchQty().multiply(matchItem.getClinchPrice()));
-//        }
-
 
         // 1. update order status
         OrderItemBO takerOrder = event.getTakerOrder();
@@ -116,6 +107,20 @@ public class OrderFilledHandler implements OrderExecutedHandler {
             toAddQty = amount;
         }
         iAccountService.exchange(order.getUserId(), toDeductCurrency, toDeductQty, toAddCurrency, toAddQty);
+
+        // 2.1 market order always come to final status, here need to release remain resource
+        if (EnumEntrustType.MARKET.getType() == order.getEntrustType()){
+            BigDecimal remainNum;
+            if (StringUtils.equalsIgnoreCase(EnumEntrustSide.BUY.getSide(),order.getEntrustSide())){
+                remainNum = takerOrder.getRemainEntrustAmount();
+            } else {
+                remainNum = takerOrder.getRemainEntrustQty();
+            }
+            if (remainNum.compareTo(BigDecimal.ZERO) > 0){
+                // notice: release deduct currency
+                iAccountService.addAvailable(order.getUserId(), toDeductCurrency, remainNum);
+            }
+        }
 
         // 3. create capital record if filled
         if (order.getOrderStatus() == EnumOrderStatus.FILLED.getCode()){

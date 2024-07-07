@@ -45,7 +45,7 @@ public class APIOrderControllerTests {
         req.setEntrustPrice(new BigDecimal(90));
         req.setEntrustQty(new BigDecimal(2));
         req.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        BusinessResp<CreateOrderResp> resp = controller.createOrder(req);
+        BusinessResp<CreateOrderResp> resp = controller.createOrder("", req);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Long orderId = resp.getData().getOrderId();
         Assumptions.assumeTrue(Objects.nonNull(orderId));
@@ -53,7 +53,7 @@ public class APIOrderControllerTests {
         // cancel order
         CancelOrderReq req1 = new CancelOrderReq();
         req1.setOrderId(orderId);
-        BusinessResp<Void> patchedOrderResp = controller.cancelOrder(req1);
+        BusinessResp<Void> patchedOrderResp = controller.cancelOrder("",req1);
         Assumptions.assumeTrue(StringUtils.equals(patchedOrderResp.getCode(), BusinessRespCode.SUCCESS.getCode()));
     }
 
@@ -69,7 +69,7 @@ public class APIOrderControllerTests {
         req.setEntrustPrice(new BigDecimal(90));
         req.setEntrustQty(new BigDecimal(2));
         req.setEntrustType(EnumEntrustType.NORMAL_LIMIT.getType());
-        BusinessResp<CreateOrderResp> resp = controller.createOrder(req);
+        BusinessResp<CreateOrderResp> resp = controller.createOrder("",req);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Assumptions.assumeTrue(Objects.nonNull(resp.getData().getOrderId()));
 
@@ -82,7 +82,7 @@ public class APIOrderControllerTests {
         req1.setBasePrice(new BigDecimal(100));
         req1.setEntrustAmount(new BigDecimal(500));
         req1.setEntrustType(EnumEntrustType.MARKET.getType());
-        resp = controller.createOrder(req1);
+        resp = controller.createOrder("",req1);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Assumptions.assumeTrue(Objects.nonNull(resp.getData().getOrderId()));
 
@@ -98,7 +98,7 @@ public class APIOrderControllerTests {
         req2.setEntrustQty(new BigDecimal(2));
         req2.setEntrustType(EnumEntrustType.PREMIUM_LIMIT.getType());
         req2.setEntrustProp(EnumEntrustProp.IOC.getType());
-        resp = controller.createOrder(req2);
+        resp = controller.createOrder("",req2);
         Assumptions.assumeTrue(StringUtils.equals(resp.getCode(), BusinessRespCode.SUCCESS.getCode()));
         Assumptions.assumeTrue(Objects.nonNull(resp.getData().getOrderId()));
     }
