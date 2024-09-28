@@ -13,7 +13,6 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -46,49 +45,6 @@ public class AuthTokenFilter implements GlobalFilter, Ordered {
         }
         return chain.filter(exchange);
     }
-
-//    private ServerHttpRequestDecorator requestDecorator(ServerWebExchange exchange, String token) {
-//        return new ServerHttpRequestDecorator(exchange.getRequest()) {
-//            @Override
-//            public Flux<DataBuffer> getBody() {
-//                Flux<DataBuffer> body = super.getBody();
-//
-//
-//                return body.map(dataBuffer -> {
-//                    byte[] content = new byte[dataBuffer.readableByteCount()];
-//                    dataBuffer.read(content);
-//                    //释放掉内存
-//                    DataBufferUtils.release(dataBuffer);
-//                    //request body的json格式数据
-//                    String bodyJson = new String(content, StandardCharsets.UTF_8);
-//                    //转化成json对象
-////                    log.info("bodyJson :{}", bodyJson);
-//                    JSONObject jsonObject = JSON.parseObject(bodyJson);
-//                    TokenPayloadBO payload = getPayload(token);
-//                    // 对原先的body进行修改操作
-//                    jsonObject.put(USER_ID, payload.getSub());
-//
-//                    String result = jsonObject.toJSONString();
-//                    //转成字节
-//                    byte[] bytes = result.getBytes();
-//                    NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
-//                    DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
-//                    buffer.write(bytes);
-//                    return buffer;
-//                });
-//            }
-//
-//            @Override
-//            public HttpHeaders getHeaders() {
-//                HttpHeaders httpHeaders = new HttpHeaders();
-//                httpHeaders.putAll(super.getHeaders());
-//                httpHeaders.remove(HttpHeaders.CONTENT_LENGTH);
-//                return httpHeaders;
-//            }
-//
-//        };
-//    }
-
 
 
     @Override

@@ -7,6 +7,4 @@ public class BaseConstant {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
-    public static final String USER_ID = "userId";
-
 }
