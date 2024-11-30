@@ -4,35 +4,28 @@ import lombok.Getter;
 
 @Getter
 public enum EnumKLineInterval {
-    
-    
-    ONE_MINUTE(1),
 
-    FIFTEEN_MINUTE(15),
-    
-    HALF_HOUR(30),
-    
-    ONE_HOUR(60),
+    ONE_SECOND(1, "1s"),
+    ONE_MINUTE(60, "1min"),
+    FIFTEEN_MINUTE(15 * 60, "15min"),
+    THIRTY_MINUTE(30 * 60, "30min"),
+    ONE_HOUR(60 * 60, "1hrs"),
+    SIX_HOUR(60 * 60 * 6, "6hrs"),
+    ONE_DAY(60 * 60 * 24, "1day"),
 
-    SIX_HOUR(60 * 6),
+    ONE_WEEK(-1, "1week"),
+    ONE_MONTH(-1, "1mon"),
+    ONE_YEAR(-1, "1yrs")
+    
 
-    ONE_DAY(60 * 24),
-
-    ONE_WEEK(-1),
-    
-    ONE_MONTH(-1),
-
-    ONE_YEAR(-1)
-    
-    
-    
-    
     ;
 
     private final int value;
+    private final String desc;
 
-    EnumKLineInterval(int value) {
+    EnumKLineInterval(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
 

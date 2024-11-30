@@ -6,34 +6,32 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 
-/**
- * price.divide(x, scale, RoundingMode.DOWN);
- */
 @Getter
 public enum EnumPricePrecision {
 
     /**
      * 0.01
      */
-    FRACTION_0_01( new BigDecimal("0.01")),
+    P_0_01(new BigDecimal("0.01")),
 
     /**
      * 0.1
      */
-    FRACTION_0_1(new BigDecimal("0.1")),
+    P_0_1(new BigDecimal("0.1")),
 
     /**
      * 1
      */
-    ROUND_1(BigDecimal.ONE),
+    P_1(new BigDecimal("1")),
 
     /**
      * 10
      */
-    ROUND_10(BigDecimal.TEN),
+    P_10(new BigDecimal("10")),
 
-    ROUND_50(new BigDecimal("50")),
+    P_50(new BigDecimal("50")),
 
+    P_100(new BigDecimal("100")),
 
     ;
 
@@ -41,8 +39,18 @@ public enum EnumPricePrecision {
     private final BigDecimal precision;
 
 
-    EnumPricePrecision( BigDecimal precision) {
+    EnumPricePrecision(BigDecimal precision) {
         this.precision = precision;
+    }
+
+
+    public static EnumPricePrecision getPrecision(BigDecimal precision){
+        for (EnumPricePrecision value : EnumPricePrecision.values()) {
+            if (value.precision.compareTo(precision) == 0){
+                return value;
+            }
+        }
+        return null;
     }
 
 }

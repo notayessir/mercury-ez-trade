@@ -1,8 +1,8 @@
 package com.notayessir.user.order.handler.impl;
 
-import com.notayessir.bo.MatchItemBO;
-import com.notayessir.bo.MatchResultBO;
-import com.notayessir.bo.OrderItemBO;
+import com.notayessir.engine.api.bo.MatchItemBO;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
 import com.notayessir.user.api.order.constant.EnumEntrustSide;
 import com.notayessir.user.api.order.constant.EnumEntrustType;
 import com.notayessir.user.order.constant.EnumOrderStatus;

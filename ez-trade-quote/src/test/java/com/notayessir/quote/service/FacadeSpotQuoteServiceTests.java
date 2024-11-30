@@ -1,12 +1,11 @@
 package com.notayessir.quote.service;
 
 import cn.hutool.core.util.IdUtil;
-import com.notayessir.bo.MatchItemBO;
-import com.notayessir.bo.MatchResultBO;
-import com.notayessir.bo.OrderItemBO;
-import com.notayessir.constant.EnumEntrustSide;
-import com.notayessir.constant.EnumEntrustType;
-import com.notayessir.constant.EnumMatchStatus;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
+import com.notayessir.engine.api.constant.EnumEntrustSide;
+import com.notayessir.engine.api.constant.EnumEntrustType;
+import com.notayessir.engine.api.constant.EnumMatchStatus;
 import com.notayessir.quote.spot.service.FacadeSpotQuoteService;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -14,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @SpringBootTest
@@ -53,7 +50,7 @@ public class FacadeSpotQuoteServiceTests {
         event.setTimestamp(System.currentTimeMillis());
         event.setCoinId(coinId);
         event.setTakerOrder(takerOrder);
-        facadeSpotQuoteService.handleQuoteUpdateEvent(event);
+        facadeSpotQuoteService.handleAggTrade(event);
 
 
         // a new buy order
@@ -77,6 +74,6 @@ public class FacadeSpotQuoteServiceTests {
         event1.setTimestamp(System.currentTimeMillis());
         event1.setCoinId(coinId);
         event1.setTakerOrder(takerOrder1);
-        facadeSpotQuoteService.handleQuoteUpdateEvent(event1);
+        facadeSpotQuoteService.handleAggTrade(event1);
     }
 }

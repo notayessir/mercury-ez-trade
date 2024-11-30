@@ -10,21 +10,18 @@ public class KLineIntervalUtil {
 
 
     public static long calcTimestamp(long timestamp, EnumKLineInterval interval){
-        if (interval.getValue() > 0){
-            return calcTimestampByMinute(timestamp, interval.getValue());
-        }
+        return switch (interval) {
+            case ONE_SECOND -> calcTimestampBySecond(timestamp);
+            case ONE_MINUTE, FIFTEEN_MINUTE, THIRTY_MINUTE, ONE_HOUR, SIX_HOUR, ONE_DAY ->
+                    calcTimestampByMinute(timestamp, interval.getValue() / 60);
+            case ONE_WEEK -> calcTimestampByWeek(timestamp);
+            case ONE_MONTH -> calcTimestampByMonth(timestamp);
+            case ONE_YEAR -> calcTimestampByYear(timestamp);
+        };
+    }
 
-        if (interval == EnumKLineInterval.ONE_WEEK){
-            return calcTimestampByWeek(timestamp);
-        }
-
-        if (interval == EnumKLineInterval.ONE_MONTH){
-            return calcTimestampByMonth(timestamp);
-        }
-
-        // EnumKLineInterval.ONE_YEAR
-        return calcTimestampByYear(timestamp);
-
+    private static long calcTimestampBySecond(long timestamp) {
+        return timestamp / 1000;
     }
 
 
@@ -71,6 +68,11 @@ public class KLineIntervalUtil {
 //        ZonedDateTime endOfMinute = startOfInterval.plusMinutes(interval);
 
         return startOfMinute.toEpochSecond();
+    }
+
+    public static void main(String[] args) {
+        long l = calcTimestampBySecond(System.currentTimeMillis());
+        System.out.println(l);
     }
 
 

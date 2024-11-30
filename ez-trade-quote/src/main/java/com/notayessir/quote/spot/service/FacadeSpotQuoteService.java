@@ -1,18 +1,19 @@
 package com.notayessir.quote.spot.service;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.notayessir.bo.MatchResultBO;
-import com.notayessir.bo.OrderItemBO;
 import com.notayessir.common.constant.EnumFieldVersion;
 import com.notayessir.common.constant.EnumRequestSource;
-import com.notayessir.common.vo.req.BasePageReq;
-import com.notayessir.common.vo.resp.BasePageResp;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
+import com.notayessir.engine.api.constant.EnumEntrustSide;
 import com.notayessir.quote.api.spot.mq.*;
 import com.notayessir.quote.common.mq.KafkaMQService;
 import com.notayessir.quote.spot.bo.GetKlineReqBO;
-import com.notayessir.quote.spot.bo.GetKlineRespBO;
+import com.notayessir.quote.spot.constant.EnumEventType;
+import com.notayessir.quote.spot.entity.AggTradeRecord;
+import com.notayessir.quote.spot.entity.Handicap;
 import com.notayessir.quote.spot.entity.KLine;
 import com.notayessir.quote.spot.entity.TickRecord;
 import com.notayessir.quote.spot.handler.HandicapHandler;
@@ -24,14 +25,17 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FacadeSpotQuoteService {
 
     @Autowired
     private ITickRecordService iTickRecordService;
+
+    @Autowired
+    private IAggTradeRecordService iAggTradeRecordService;
 
     @Autowired
     private IKLineService ikLineService;
@@ -46,94 +50,109 @@ public class FacadeSpotQuoteService {
     private KafkaMQService kafkaMQService;
 
 
-    public void handleQuoteUpdateEvent(MatchResultBO event) {
-        if (iTickRecordService.countTickRecord(event.getGlobalSequence()) > 0){
-            return;
+
+    public DepthDTO generateDepth(Long coinId){
+        List<Handicap> handicaps = iHandicapService.findHandicap(coinId);
+        Map<Integer, List<Handicap>> groupedByEntrustSide = handicaps.stream()
+                .collect(Collectors.groupingBy(Handicap::getEntrustSide));
+        List<Handicap> buyHandicapList = groupedByEntrustSide.get(EnumEntrustSide.BUY.getCode());
+        List<Handicap> sellHandicapList = groupedByEntrustSide.get(EnumEntrustSide.SELL.getCode());
+
+        DepthDTO depthDTO = generateDepth(buyHandicapList, sellHandicapList);
+        depthDTO.setCoinId(coinId);
+        return depthDTO;
+    }
+
+
+    public DepthDTO generateDepth(List<Handicap> buyHandicapList, List<Handicap> sellHandicapList){
+        Map<BigDecimal, BigDecimal> bid = generateDepth(buyHandicapList);
+        Map<BigDecimal, BigDecimal> ask = generateDepth(sellHandicapList);
+
+        DepthDTO depthDTO = new DepthDTO();
+        depthDTO.setAsk(ask);
+        depthDTO.setBid(bid);
+        return depthDTO;
+    }
+
+
+
+    private Map<BigDecimal, BigDecimal> generateDepth(List<Handicap> handicaps) {
+        Map<BigDecimal, BigDecimal> priceQtyMap = new TreeMap<>();
+        for (Handicap handicap : handicaps) {
+            BigDecimal qty = new BigDecimal(handicap.getQty());
+            if (qty.compareTo(BigDecimal.ZERO) == 0){
+                continue;
+            }
+            BigDecimal price = new BigDecimal(handicap.getPrice());
+            if (priceQtyMap.containsKey(price)){
+                qty = priceQtyMap.get(price).add(qty);
+            }
+            priceQtyMap.put(price, qty);
+        }
+        return priceQtyMap;
+    }
+
+
+    private List<KLineDTO> buildKLineDTOList(List<KLine> kLines){
+        if (CollectionUtil.isEmpty(kLines)){
+            return Collections.emptyList();
         }
 
-
-        txTemplate.executeWithoutResult(transactionStatus -> {
-            // 1. save tick record
-            QTickRecordDTO qTickRecord = createTickRecord(event);
-
-            // 2. update order book
-            OrderItemBO takerOrder = event.getTakerOrder();
-            HandicapHandler handler = HandicapHandler.getInstance(takerOrder.getMatchStatus());
-            List<QOrderBookDTO> qOrderBooks = handler.handleHandicapUpdatedEventWithReturn(event);
-
-            // 3. update k line
-            List<QKLineDTO> qKLines = handleKLineUpdatedEvent(event);
-
-            // 4. publish
-            QuoteUpdatedEvent quoteUpdatedEvent = buildQuoteUpdatedEvent(event.getGlobalSequence(), qTickRecord, qOrderBooks, qKLines);
-            kafkaMQService.sendMessage(QuoteTopic.QUOTE_UPDATED_TOPIC, quoteUpdatedEvent);
-        });
-    }
-
-    private QuoteUpdatedEvent buildQuoteUpdatedEvent(Long globalSequence, QTickRecordDTO qTickRecord, List<QOrderBookDTO> qOrderBooks, List<QKLineDTO> qKLines) {
-        QuoteUpdatedEvent event = new QuoteUpdatedEvent();
-        event.setRequestId(globalSequence);
-        event.setQKLines(qKLines);
-        event.setQTickRecord(qTickRecord);
-        event.setQOrderBooks(qOrderBooks);
-        return event;
-    }
-
-    private QTickRecordDTO createTickRecord(MatchResultBO event) {
-        TickRecord tickRecord = buildTickRecord(event);
-        iTickRecordService.createTickRecord(tickRecord);
-
-
-        QTickRecordDTO target = new QTickRecordDTO();
-        target.setCreateTime(tickRecord.getCreateTime());
-        target.setGlobalSequence(tickRecord.getGlobalSequence());
-        target.setTxSequence(tickRecord.getTxSequence());
-        target.setTickTimestamp(tickRecord.getTickTimestamp());
-        target.setClinchQty(tickRecord.getClinchQty());
-        target.setClinchAmount(tickRecord.getClinchAmount());
-        target.setCoinId(tickRecord.getCoinId());
-        return target;
-    }
-
-
-
-
-    private List<QKLineDTO> handleKLineUpdatedEvent(MatchResultBO event) {
-        BigDecimal qty = event.gatherClinchQty();
-        if (qty.compareTo(BigDecimal.ZERO) <= 0){
-            return new ArrayList<>(0);
-        }
-        List<KLine> kLines = ikLineService.handleKLineUpdatedEvent(event);
-        List<QKLineDTO> target = new ArrayList<>(kLines.size());
+        List<KLineDTO> kLineDTOList = new ArrayList<>(kLines.size());
         for (KLine kLine : kLines) {
-
-
-            QKLineDTO item = new QKLineDTO();
-            item.setUpdateTime(kLine.getUpdateTime());
-            item.setCreateTime(kLine.getCreateTime());
-            item.setVersion(kLine.getVersion());
-            item.setClinchQty(kLine.getClinchQty());
-            item.setClosePrice(kLine.getClosePrice());
-            item.setClinchAmount(kLine.getClinchAmount());
-            item.setLowPrice(kLine.getLowPrice());
-            item.setHighPrice(kLine.getHighPrice());
-            item.setOpenPrice(kLine.getOpenPrice());
-            item.setStatisticStartTime(kLine.getStatisticStartTime());
-            item.setTimeInterval(kLine.getTimeInterval());
-            item.setCoinId(kLine.getCoinId());
-
-
-            target.add(item);
+            KLineDTO kLineDTO = new KLineDTO();
+            kLineDTO.setUpdateTime(kLine.getUpdateTime());
+            kLineDTO.setCreateTime(kLine.getCreateTime());
+            kLineDTO.setVersion(kLine.getVersion());
+            kLineDTO.setClinchQty(kLine.getClinchQty());
+            kLineDTO.setClosePrice(kLine.getClosePrice());
+            kLineDTO.setClinchAmount(kLine.getClinchAmount());
+            kLineDTO.setLowPrice(kLine.getLowPrice());
+            kLineDTO.setHighPrice(kLine.getHighPrice());
+            kLineDTO.setOpenPrice(kLine.getOpenPrice());
+            kLineDTO.setStatisticStartTime(kLine.getStatisticStartTime());
+            kLineDTO.setTimeInterval(kLine.getTimeInterval());
+            kLineDTO.setCoinId(kLine.getCoinId());
+            kLineDTOList.add(kLineDTO);
         }
+        return kLineDTOList;
+    }
+
+
+    private AggTradeRecordDTO buildAggTradeRecordDTO(AggTradeRecord aggTradeRecord) {
+        AggTradeRecordDTO target = new AggTradeRecordDTO();
+        target.setCreateTime(aggTradeRecord.getCreateTime());
+        target.setGlobalSequence(aggTradeRecord.getGlobalSequence());
+        target.setTxSequence(aggTradeRecord.getTxSequence());
+        target.setTickTimestamp(aggTradeRecord.getTickTimestamp());
+        target.setClinchQty(aggTradeRecord.getClinchQty());
+        target.setClinchAmount(aggTradeRecord.getClinchAmount());
+        target.setCoinId(aggTradeRecord.getCoinId());
         return target;
     }
 
 
 
-
-
-    private TickRecord buildTickRecord(MatchResultBO event) {
+    private TickRecord buildTickRecord(MatchResultBO event, EnumEventType eventType) {
         TickRecord record = new TickRecord();
+
+        record.setId(IdUtil.getSnowflakeNextId());
+        record.setGlobalSequence(event.getGlobalSequence());
+        record.setTxSequence(event.getTxSequence());
+
+        record.setCoinId(event.getCoinId());
+        record.setTickTimestamp(event.getTimestamp());
+        record.setVersion(EnumFieldVersion.INIT.getCode());
+        LocalDateTime now = LocalDateTime.now();
+        record.setCreateTime(now);
+        record.setUpdateTime(now);
+        record.setEventType(eventType.getType());
+        return record;
+    }
+
+
+    private AggTradeRecord buildAggTradeRecord(MatchResultBO event) {
+        AggTradeRecord record = new AggTradeRecord();
 
         record.setId(IdUtil.getSnowflakeNextId());
         record.setGlobalSequence(event.getGlobalSequence());
@@ -155,42 +174,14 @@ public class FacadeSpotQuoteService {
     }
 
 
-    private BasePageResp<GetKlineRespBO> findKline(BasePageReq<GetKlineReqBO> pageReq) {
-        Page<KLine> page = ikLineService.findKline(pageReq);
-        return toBasePageGetKlineRespBO(page);
+    private List<KLine> findKline(GetKlineReqBO reqBO) {
+        return ikLineService.findKline(reqBO);
     }
 
-    private BasePageResp<GetKlineRespBO> toBasePageGetKlineRespBO(Page<KLine> page) {
-        List<GetKlineRespBO> list = new ArrayList<>(page.getRecords().size());
-        for (KLine kLine : page.getRecords()){
-            GetKlineRespBO target = new GetKlineRespBO();
-            target.setId(kLine.getId());
-            target.setCoinId(kLine.getCoinId());
-            target.setTimeInterval(kLine.getTimeInterval());
-            target.setStatisticStartTime(kLine.getStatisticStartTime());
 
-            target.setOpenPrice(kLine.getOpenPrice());
-            target.setHighPrice(kLine.getHighPrice());
-            target.setLowPrice(kLine.getLowPrice());
-            target.setClosePrice(kLine.getClosePrice());
-
-            target.setClinchQty(kLine.getClinchQty());
-            target.setClinchAmount(kLine.getClinchAmount());
-
-            list.add(target);
-        }
-
-        BasePageResp<GetKlineRespBO> resp = new BasePageResp<>();
-        resp.setCurrent(page.getCurrent());
-        resp.setSize(page.getSize());
-        resp.setTotal(page.getTotal());
-        resp.setRecords(list);
-        return resp;
-    }
-
-    private BasePageResp<GetKlineResp> toBasePageFindKlineResp(BasePageResp<GetKlineRespBO> pageResp) {
-        List<GetKlineResp> list = new ArrayList<>(pageResp.getRecords().size());
-        for (GetKlineRespBO kLine : pageResp.getRecords()){
+    private List<GetKlineResp> toGetKlineRespBO(List<KLine> sourceList) {
+        List<GetKlineResp> targetList = new ArrayList<>(sourceList.size());
+        for (KLine kLine : sourceList){
             GetKlineResp target = new GetKlineResp();
             target.setId(kLine.getId());
             target.setCoinId(kLine.getCoinId());
@@ -205,41 +196,72 @@ public class FacadeSpotQuoteService {
             target.setClinchQty(kLine.getClinchQty());
             target.setClinchAmount(kLine.getClinchAmount());
 
-            list.add(target);
+            targetList.add(target);
         }
 
-        BasePageResp<GetKlineResp> resp = new BasePageResp<>();
-        resp.setCurrent(pageResp.getCurrent());
-        resp.setSize(pageResp.getSize());
-        resp.setTotal(pageResp.getTotal());
-        resp.setRecords(list);
-
-        return resp;
+        return targetList;
     }
 
-    private BasePageReq<GetKlineReqBO> toBasePageFindKlineReqBO(BasePageReq<GetKlineReq> pageReq) {
-        BasePageReq<GetKlineReqBO> target = new BasePageReq<>();
-        target.setPageNum(pageReq.getPageNum());
-        target.setIp(pageReq.getIp());
-        target.setUserId(pageReq.getUserId());
-        target.setPageSize(pageReq.getPageSize());
-        target.setRequestId(pageReq.getRequestId());
+    private GetKlineReqBO toGetKlineReqBO(GetKlineReq sourceQ) {
 
-        GetKlineReq sourceQ = pageReq.getQuery();
         GetKlineReqBO targetQ = new GetKlineReqBO();
         targetQ.setRequestSource(EnumRequestSource.PUBLIC_API);
         targetQ.setInterval(sourceQ.getInterval());
+        targetQ.setSymbol(sourceQ.getSymbol());
+        targetQ.setEndTime(sourceQ.getEndTime());
+        targetQ.setStartTime(sourceQ.getStartTime());
         targetQ.setCoinId(sourceQ.getCoinId());
-
-        target.setQuery(targetQ);
-        return target;
+        return targetQ;
     }
 
-    public BasePageResp<GetKlineResp> publicApiFindKline(BasePageReq<GetKlineReq> pageReq) {
-        BasePageReq<GetKlineReqBO> page = toBasePageFindKlineReqBO(pageReq);
+    public List<GetKlineResp> publicApiFindKline(GetKlineReq req) {
+        GetKlineReqBO reqBO = toGetKlineReqBO(req);
 
-        BasePageResp<GetKlineRespBO> pageResp = findKline(page);
+        List<KLine> list = findKline(reqBO);
 
-        return toBasePageFindKlineResp(pageResp);
+        return toGetKlineRespBO(list);
     }
+
+    public void handleDepth(MatchResultBO event) {
+        txTemplate.executeWithoutResult(transactionStatus -> {
+            TickRecord tickRecord = buildTickRecord(event, EnumEventType.DEPTH);
+            iTickRecordService.saveTickRecord(tickRecord);
+
+            OrderItemBO takerOrder = event.getTakerOrder();
+            HandicapHandler handler = HandicapHandler.getInstance(takerOrder.getMatchStatus());
+            handler.handleHandicapUpdatedEvent(event);
+
+            DepthDTO depthDTO = generateDepth(event.getCoinId());
+            kafkaMQService.sendMessage(QuoteTopic.DEPTH_TOPIC, depthDTO);
+        });
+
+    }
+
+    public void handleKLine(MatchResultBO event) {
+        txTemplate.executeWithoutResult(transactionStatus -> {
+
+            TickRecord tickRecord = buildTickRecord(event, EnumEventType.KLINE);
+            iTickRecordService.saveTickRecord(tickRecord);
+
+            List<KLine> kLines = ikLineService.handleKLineUpdatedEvent(event);
+            List<KLineDTO> kLineDTOList = buildKLineDTOList(kLines);
+
+            kafkaMQService.sendMessage(QuoteTopic.K_LINE_TOPIC, kLineDTOList);
+        });
+
+    }
+
+    public void handleAggTrade(MatchResultBO event) {
+        txTemplate.executeWithoutResult(transactionStatus -> {
+            TickRecord tickRecord = buildTickRecord(event, EnumEventType.AGG_TRADE);
+            iTickRecordService.saveTickRecord(tickRecord);
+
+            AggTradeRecord aggTradeRecord = buildAggTradeRecord(event);
+            iAggTradeRecordService.saveAggTradeRecord(aggTradeRecord);
+
+            AggTradeRecordDTO aggTradeRecordDTO = buildAggTradeRecordDTO(aggTradeRecord);
+            kafkaMQService.sendMessage(QuoteTopic.AGG_TRADE_TOPIC, aggTradeRecordDTO);
+        });
+    }
+
 }

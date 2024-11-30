@@ -12,7 +12,7 @@ import lombok.Setter;
  * </p>
  *
  * @author nobody
- * @since 2024-04-06
+ * @since 2024-11-10
  */
 @Getter
 @Setter
@@ -24,10 +24,6 @@ public class TickRecord implements Serializable {
     private Long id;
 
     private Long coinId;
-
-    private String clinchQty;
-
-    private String clinchAmount;
 
     private Long tickTimestamp;
 
@@ -41,5 +37,5 @@ public class TickRecord implements Serializable {
 
     private LocalDateTime updateTime;
 
-    private String event;
+    private String eventType;
 }

@@ -92,6 +92,12 @@
         </dependency>
 
 
+        <dependency>
+            <groupId>com.notayessir</groupId>
+            <artifactId>ez-match-engine-api</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
 
     </dependencies>
 </project>

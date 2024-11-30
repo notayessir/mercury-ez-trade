@@ -1,6 +1,6 @@
 package com.notayessir.user.order.handler;
 
-import com.notayessir.bo.OrderItemBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
 import com.notayessir.user.api.order.constant.EnumEntrustSide;
 import com.notayessir.user.order.entity.Order;
 import com.notayessir.user.order.service.IOrderService;

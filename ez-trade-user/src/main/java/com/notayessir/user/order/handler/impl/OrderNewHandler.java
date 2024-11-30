@@ -1,7 +1,7 @@
 package com.notayessir.user.order.handler.impl;
 
-import com.notayessir.bo.MatchResultBO;
-import com.notayessir.bo.OrderItemBO;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
 import com.notayessir.user.order.handler.OrderExecutedHandler;
 import com.notayessir.user.order.service.IOrderService;
 import com.notayessir.user.user.service.IAccountService;

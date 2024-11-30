@@ -12,11 +12,12 @@
 		<module>ez-trade-common</module>
 		<module>ez-trade-user</module>
 		<module>ez-trade-quote</module>
-		<module>ez-trade-queue</module>
 		<module>ez-trade-user-api</module>
 		<module>ez-trade-stream</module>
 		<module>ez-trade-quote-api</module>
         <module>ez-trade-gateway</module>
+		<module>ez-match-engine</module>
+		<module>ez-match-engine-api</module>
 	</modules>
 	<groupId>com.notayessir</groupId>
 	<name>easy-trade</name>

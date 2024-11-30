@@ -1,14 +1,11 @@
 package com.notayessir.quote.spot.handler;
 
-import com.notayessir.bo.MatchResultBO;
 import com.notayessir.common.web.EZAppContext;
-import com.notayessir.constant.EnumMatchStatus;
-import com.notayessir.quote.api.spot.mq.QOrderBookDTO;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.constant.EnumMatchStatus;
 import com.notayessir.quote.spot.handler.impl.CancelHandicapHandler;
 import com.notayessir.quote.spot.handler.impl.FilledHandicapHandler;
 import com.notayessir.quote.spot.handler.impl.NewHandicapHandler;
-
-import java.util.List;
 
 public interface HandicapHandler {
 
@@ -27,5 +24,5 @@ public interface HandicapHandler {
     void handleHandicapUpdatedEvent(MatchResultBO event);
 
 
-    List<QOrderBookDTO> handleHandicapUpdatedEventWithReturn(MatchResultBO event);
+//    List<OrderBookDTO> handleHandicapUpdatedEventWithReturn(MatchResultBO event);
 }

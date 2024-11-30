@@ -1,37 +1,31 @@
 package com.notayessir.stream.config;
 
 
-import com.notayessir.stream.spot.constant.StreamTopic;
+import com.notayessir.stream.spot.service.SpotWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 
-@EnableWebSocketMessageBroker
 @Configuration
-public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+public class WebsocketConfig implements WebSocketConfigurer {
 
-    @Lazy
     @Autowired
-    private TaskScheduler messageBrokerTaskScheduler;
+    private SpotWebSocketHandler spotWebsocketHandler;
+
+    @Autowired
+    private SimpMessagingTemplate template;
+
+
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("stream-service/spot/public-api/v1/quote");
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(spotWebsocketHandler, "/stream-service/spot/public-api/v1/quote");
+
+
     }
-
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-//        config.setApplicationDestinationPrefixes("/app");
-        config.enableSimpleBroker(StreamTopic.SPOT_STREAM_PREFIX)
-                .setHeartbeatValue(new long[] {10000, 20000})
-                .setTaskScheduler(messageBrokerTaskScheduler);
-    }
-
-
 }

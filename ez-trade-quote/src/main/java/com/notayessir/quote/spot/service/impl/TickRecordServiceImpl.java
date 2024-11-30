@@ -12,14 +12,8 @@ public class TickRecordServiceImpl extends ServiceImpl<TickRecordMapper, TickRec
 
 
     @Override
-    public void createTickRecord(TickRecord tickRecord) {
+    public void saveTickRecord(TickRecord tickRecord) {
         this.save(tickRecord);
     }
 
-    @Override
-    public long countTickRecord(Long globalSequence) {
-        LambdaQueryWrapper<TickRecord> qw = new LambdaQueryWrapper<>();
-        qw.eq(TickRecord::getGlobalSequence, globalSequence);
-        return this.count(qw);
-    }
 }

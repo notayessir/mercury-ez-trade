@@ -3,9 +3,8 @@ package com.notayessir.quote.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.notayessir.common.constant.EnumFieldVersion;
-import com.notayessir.constant.EnumEntrustSide;
+import com.notayessir.engine.api.constant.EnumEntrustSide;
 import com.notayessir.quote.spot.entity.Handicap;
-import com.notayessir.quote.spot.service.FacadeSpotQuoteService;
 import com.notayessir.quote.spot.service.IHandicapService;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ public class HandicapServiceTests {
         handicap.setCreateTime(LocalDateTime.now());
         handicap.setUpdateTime(LocalDateTime.now());
         handicap.setEntrustSide(EnumEntrustSide.SELL.getCode());
-        iHandicapService.saveHandicapAndSyncCache(handicap);
+        iHandicapService.save(handicap);
 
          handicap = new Handicap();
         handicap.setPrice("695.7116");
@@ -50,7 +49,7 @@ public class HandicapServiceTests {
         handicap.setCreateTime(LocalDateTime.now());
         handicap.setUpdateTime(LocalDateTime.now());
         handicap.setEntrustSide(EnumEntrustSide.SELL.getCode());
-        iHandicapService.saveHandicapAndSyncCache(handicap);
+        iHandicapService.save(handicap);
     }
 
     @Test

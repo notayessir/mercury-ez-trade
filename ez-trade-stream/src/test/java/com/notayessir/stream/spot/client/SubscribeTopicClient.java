@@ -19,8 +19,8 @@ public class SubscribeTopicClient {
 
         stompClient.setMessageConverter(new StringMessageConverter());
 
-        String url = "ws://127.0.0.1:38090/stream-service/public-api/spot/v1";
-        StompSessionHandler sessionHandler = new SendMessageHandler();
+        String url = "ws://127.0.0.1:38084/stream-service/spot/public-api/v1/quote";
+        StompSessionHandler sessionHandler = new SubscribeTopicHandler();
         CompletableFuture<StompSession> future = stompClient.connectAsync(url, sessionHandler);
         StompSession stompSession = future.get();
         System.out.println(stompSession);

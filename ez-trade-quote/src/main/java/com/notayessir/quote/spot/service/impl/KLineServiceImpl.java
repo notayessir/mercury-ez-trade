@@ -2,12 +2,10 @@ package com.notayessir.quote.spot.service.impl;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.notayessir.bo.MatchResultBO;
-import com.notayessir.bo.OrderItemBO;
 import com.notayessir.common.constant.EnumFieldVersion;
-import com.notayessir.common.vo.req.BasePageReq;
+import com.notayessir.engine.api.bo.MatchResultBO;
+import com.notayessir.engine.api.bo.OrderItemBO;
 import com.notayessir.quote.spot.bo.GetKlineReqBO;
 import com.notayessir.quote.spot.constant.EnumKLineInterval;
 import com.notayessir.quote.spot.entity.KLine;
@@ -39,14 +37,12 @@ public class KLineServiceImpl extends ServiceImpl<KLineMapper, KLine> implements
     }
 
     @Override
-    public Page<KLine> findKline(BasePageReq<GetKlineReqBO> pageReq) {
-        GetKlineReqBO query = pageReq.getQuery();
-        Page<KLine> iPage = Page.of(pageReq.getPageNum(), pageReq.getPageSize());
+    public List<KLine> findKline(GetKlineReqBO query) {
         LambdaQueryWrapper<KLine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(KLine::getCoinId, query.getCoinId())
                 .eq(KLine::getTimeInterval, query.getInterval())
                 .orderByDesc(KLine::getId);
-        return this.page(iPage, queryWrapper);
+        return list(queryWrapper);
     }
 
 

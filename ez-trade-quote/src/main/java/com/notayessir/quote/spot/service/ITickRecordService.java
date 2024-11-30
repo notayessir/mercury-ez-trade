@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ITickRecordService extends IService<TickRecord> {
 
 
-    void createTickRecord(TickRecord tickRecord);
+    void saveTickRecord(TickRecord tickRecord);
 
-    long countTickRecord(Long globalSequence);
 }

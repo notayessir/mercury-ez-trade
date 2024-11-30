@@ -33,7 +33,7 @@ public class CodeGenerator {
                     ; // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude(Arrays.asList("t_handicap")) // 设置需要生成的表名
+                    builder.addInclude(Arrays.asList("t_tick_record", "agg_trade_record")) // 设置需要生成的表名
                             .addTablePrefix("t_")
                             .entityBuilder()
                             .enableLombok()
